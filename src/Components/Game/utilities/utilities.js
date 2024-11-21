@@ -1,10 +1,7 @@
 import { GRID_SIZE, INITIAL_CELL_VALUE } from "../constants";
 
-const getIndexOfFirstEmptyCellFromTop = (board) => {
-  return board.findIndex((row) => row.some((cell) => cell === null));
-};
-
 export const getRandomCellCoordinates = () => {
+  //get random place from 0 to 6
   const randomRow = Math.floor(Math.random() * GRID_SIZE);
   const randomCol = Math.floor(Math.random() * GRID_SIZE);
   return { randomRow, randomCol };
@@ -19,6 +16,14 @@ export const generateInitialBoard = () => {
   return board;
 };
 
+const getRowOfFirstEmptyCellAbove = (board, columnIndex) => {
+  for (let row = 0; row < board.length; row++) {
+    if (board[row][columnIndex] === null) {
+      return row;
+    }
+  }
+};
+
 export const moveUp = (board) => {
   const clonedBoard = [...board];
 
@@ -26,12 +31,25 @@ export const moveUp = (board) => {
     const shouldSkipFirstRow = rowIndex === 0;
     if (shouldSkipFirstRow) return;
 
-    row.forEach((cellValue, cellIndex) => {
+    row.forEach((cellValue, columnIndex) => {
       if (cellValue) {
-        const indexOfEmptyCell = getIndexOfFirstEmptyCellFromTop(clonedBoard);
+        //minus 1 because we want to get the row above the top most empty one
+        const indexOfRowForEmptyCellAbove =
+          getRowOfFirstEmptyCellAbove(clonedBoard, columnIndex) - 1;
 
-        clonedBoard[indexOfEmptyCell][cellIndex] = cellValue;
-        row[cellIndex] = null;
+        const shouldMerge =
+          indexOfRowForEmptyCellAbove !== -1 &&
+          clonedBoard[indexOfRowForEmptyCellAbove][columnIndex] === cellValue;
+
+        if (shouldMerge) {
+          clonedBoard[indexOfRowForEmptyCellAbove][columnIndex] = cellValue * 2;
+          row[columnIndex] = null;
+          return;
+        }
+
+        //plus 1 because we want to get the row above the top most empty one
+        clonedBoard[indexOfRowForEmptyCellAbove + 1][columnIndex] = cellValue;
+        row[columnIndex] = null;
       }
     });
   });
