@@ -11,26 +11,38 @@ import {
 } from "./utilities";
 
 const INITIAL_BOARD = generateInitialBoard();
-
-const generateNewTile = () => {
-  const { randomRow, randomCol } = getRandomCellCoordinates();
-  return {
-    randomRow,
-    randomCol,
-  };
-};
-
+// [
+//   [null, null, null, null, null, null],
+//   [null, 2, null, null, null, null],
+//   [null, null, null, 4, null, null],
+//   [null, null, null, null, null, null],
+//   [null, null, null, null, null, null],
+//   [null, null, null, null, null, null],
+// ];
 export const Game = () => {
   const [board, setBoard] = useState(INITIAL_BOARD);
 
-  const getBoardAfterSpawningNewTile = (board) => {
-    let newTile;
-    const { randomRow, randomCol } = generateNewTile();
-    while (board[randomRow][randomCol] !== null) {
-      newTile = generateNewTile();
+  const spawnNewTile = (board) => {
+    const newBoard = [...board];
+    const { randomRow, randomCol } = getRandomCellCoordinates();
+
+    let tempRandomRow = randomRow;
+    let tempRandomCol = randomCol;
+
+    let isEmptyTileFound = false;
+
+    while (!isEmptyTileFound) {
+      const isCellEmpty = board[tempRandomRow][tempRandomCol] === null;
+      if (isCellEmpty) {
+        isEmptyTileFound = true;
+      } else {
+        tempRandomRow = getRandomCellCoordinates().randomRow;
+        tempRandomCol = getRandomCellCoordinates().randomCol;
+      }
     }
-    board[randomRow][randomCol] = INITIAL_CELL_VALUE;
-    return board;
+
+    newBoard[tempRandomRow][tempRandomCol] = INITIAL_CELL_VALUE;
+    return newBoard;
   };
 
   const handleKeyDown = (event) => {
@@ -38,10 +50,10 @@ export const Game = () => {
       case "ArrowUp":
         //steps
         const boardAfterMoveUp = moveUp(board);
-        const boardAfterSpawningNewTile =
-          getBoardAfterSpawningNewTile(boardAfterMoveUp);
+        const boardAfterMoveUpAndSpawningNewTile =
+          spawnNewTile(boardAfterMoveUp);
 
-        setBoard(boardAfterSpawningNewTile);
+        setBoard(boardAfterMoveUpAndSpawningNewTile);
         break;
       case "ArrowDown":
         const boardAfterMoveDown = moveDown(board);
