@@ -17,7 +17,7 @@ export const generateInitialBoard = () => {
 };
 
 const getFirstRowWithValue = (board, columnIndex, rowIndex) => {
-  for (let row = 0; row < rowIndex; row++) {
+  for (let row = rowIndex - 1; row >= 0; row--) {
     if (board[row][columnIndex] !== null) {
       return row;
     }
@@ -46,24 +46,31 @@ export const moveUp = (board) => {
           rowIndex
         );
 
-        console.log("rowWithNotEmptyCellAbove", rowWithNotEmptyCellAbove);
+        const allCellsAboveAreEmpty = rowWithNotEmptyCellAbove === null;
 
-        if (rowWithNotEmptyCellAbove === null) {
+        if (allCellsAboveAreEmpty) {
           clonedBoard[0][columnIndex] = cellValue;
           row[columnIndex] = null;
           return;
         }
 
-        const cellWithExistingValueAbove =
-          clonedBoard[rowWithNotEmptyCellAbove][columnIndex];
-
-        const shouldMerge = cellWithExistingValueAbove === cellValue;
+        const shouldMerge =
+          rowWithNotEmptyCellAbove !== null &&
+          clonedBoard[rowWithNotEmptyCellAbove][columnIndex] === cellValue;
 
         if (shouldMerge) {
           clonedBoard[rowWithNotEmptyCellAbove][columnIndex] = cellValue * 2;
           row[columnIndex] = null;
           return;
         }
+        if (rowWithNotEmptyCellAbove + 1 === rowIndex) {
+          return;
+        }
+
+        //TODO: blad
+        //4
+        //2
+        //i klikniesz strzalke do gory to 2 przesuwa sie randomowo
 
         const indexOfRowBelowCellWithValue = rowWithNotEmptyCellAbove + 1;
         clonedBoard[indexOfRowBelowCellWithValue][columnIndex] = cellValue;
