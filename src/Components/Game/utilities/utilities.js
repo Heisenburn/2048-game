@@ -16,15 +16,29 @@ export const generateInitialBoard = () => {
   return board;
 };
 
-const getFirstRowWithValue = (board, columnIndex, rowIndex) => {
-  for (let row = rowIndex - 1; row >= 0; row--) {
-    if (board[row][columnIndex] !== null) {
-      return row;
+const getFirstRowWithValue = (
+  board,
+  columnIndex,
+  rowIndex,
+  searchDown = false
+) => {
+  if (searchDown) {
+    // Search downwards from the current row
+    for (let row = rowIndex + 1; row < GRID_SIZE; row++) {
+      if (board[row][columnIndex] !== null) {
+        return row;
+      }
+    }
+  } else {
+    // upward search
+    for (let row = rowIndex - 1; row >= 0; row--) {
+      if (board[row][columnIndex] !== null) {
+        return row;
+      }
     }
   }
   return null;
 };
-
 const rowHasValues = (row) => {
   return row.some((cell) => cell !== null);
 };
@@ -67,11 +81,6 @@ export const moveUp = (board) => {
           return;
         }
 
-        //TODO: blad
-        //4
-        //2
-        //i klikniesz strzalke do gory to 2 przesuwa sie randomowo
-
         const indexOfRowBelowCellWithValue = rowWithNotEmptyCellAbove + 1;
         clonedBoard[indexOfRowBelowCellWithValue][columnIndex] = cellValue;
         row[columnIndex] = null;
@@ -81,9 +90,54 @@ export const moveUp = (board) => {
 
   return clonedBoard;
 };
+export const moveDown = (board) => {
+  const clonedBoard = [...board];
 
-export const moveDown = (board) => {};
+  // Start from second to last row and move upwards
+  for (let rowIndex = GRID_SIZE - 2; rowIndex >= 0; rowIndex--) {
+    const row = clonedBoard[rowIndex];
+    const shouldSkipEntireRow = !rowHasValues(row);
+    if (shouldSkipEntireRow) continue;
 
+    row.forEach((cellValue, columnIndex) => {
+      if (cellValue) {
+        const rowWithNotEmptyCellBelow = getFirstRowWithValue(
+          clonedBoard,
+          columnIndex,
+          rowIndex,
+          true // Added parameter to search downwards
+        );
+
+        const allCellsBelowAreEmpty = rowWithNotEmptyCellBelow === null;
+
+        if (allCellsBelowAreEmpty) {
+          clonedBoard[GRID_SIZE - 1][columnIndex] = cellValue;
+          row[columnIndex] = null;
+          return;
+        }
+
+        const shouldMerge =
+          rowWithNotEmptyCellBelow !== null &&
+          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] === cellValue;
+
+        if (shouldMerge) {
+          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] = cellValue * 2;
+          row[columnIndex] = null;
+          return;
+        }
+        if (rowWithNotEmptyCellBelow - 1 === rowIndex) {
+          return;
+        }
+
+        const indexOfRowAboveCellWithValue = rowWithNotEmptyCellBelow - 1;
+        clonedBoard[indexOfRowAboveCellWithValue][columnIndex] = cellValue;
+        row[columnIndex] = null;
+      }
+    });
+  }
+
+  return clonedBoard;
+};
 export const moveLeft = (board) => {
   const clonedBoard = [...board];
 };

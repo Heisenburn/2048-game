@@ -57,15 +57,24 @@ export const Game = () => {
         break;
       case "ArrowDown":
         const boardAfterMoveDown = moveDown(board);
-        setBoard(boardAfterMoveDown);
+        const boardAfterMoveDownAndSpawningNewTile =
+          spawnNewTile(boardAfterMoveDown);
+
+        setBoard(boardAfterMoveDownAndSpawningNewTile);
         break;
       case "ArrowLeft":
         const boardAfterMoveLeft = moveLeft(board);
-        setBoard(boardAfterMoveLeft);
+        const boardAfterMoveLeftAndSpawningNewTile =
+          spawnNewTile(boardAfterMoveLeft);
+
+        setBoard(boardAfterMoveLeftAndSpawningNewTile);
         break;
       case "ArrowRight":
         const boardAfterMoveRight = moveRight(board);
-        setBoard(boardAfterMoveRight);
+        const boardAfterMoveRightAndSpawningNewTile =
+          spawnNewTile(boardAfterMoveRight);
+
+        setBoard(boardAfterMoveRightAndSpawningNewTile);
         break;
       default:
         break;
