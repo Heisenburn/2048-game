@@ -11,14 +11,7 @@ import {
 } from "./utilities";
 
 const INITIAL_BOARD = generateInitialBoard();
-// [
-//   [null, null, null, null, null, null],
-//   [null, 2, null, null, null, null],
-//   [null, null, null, 4, null, null],
-//   [null, null, null, null, null, null],
-//   [null, null, null, null, null, null],
-//   [null, null, null, null, null, null],
-// ];
+
 export const Game = () => {
   const [board, setBoard] = useState(INITIAL_BOARD);
 

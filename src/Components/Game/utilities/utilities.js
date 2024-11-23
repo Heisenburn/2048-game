@@ -8,11 +8,21 @@ export const getRandomCellCoordinates = () => {
 };
 
 export const generateInitialBoard = () => {
-  const board = Array(GRID_SIZE)
-    .fill(null)
-    .map(() => Array(GRID_SIZE).fill(null));
+  // [
+  //   [null, null, null, null, null, null],
+  //   [null, 2 (random), null, null, null, null],
+  //   [null, null, null, null, null, null],
+  //   [null, null, null, null, null, null],
+  //   [null, null, null, null, null, null],
+  //   [null, null, null, null, null, null],
+  // ];
+  const board = Array.from({ length: GRID_SIZE }, () =>
+    Array(GRID_SIZE).fill(null)
+  );
+
   const { randomRow, randomCol } = getRandomCellCoordinates();
   board[randomRow][randomCol] = INITIAL_CELL_VALUE;
+
   return board;
 };
 
@@ -43,94 +53,55 @@ const rowHasValues = (row) => {
   return row.some((cell) => cell !== null);
 };
 
-export const moveUp = (board) => {
+const moveInDirection = (board, isMovingDown) => {
   const clonedBoard = [...board];
+  const startIndex = isMovingDown ? GRID_SIZE - 2 : 1;
+  const endIndex = isMovingDown ? -1 : GRID_SIZE;
+  const step = isMovingDown ? -1 : 1;
 
-  // Start from index 1 to skip first row
-  for (let rowIndex = 1; rowIndex < GRID_SIZE; rowIndex++) {
+  for (let rowIndex = startIndex; rowIndex !== endIndex; rowIndex += step) {
     const row = clonedBoard[rowIndex];
     const shouldSkipEntireRow = !rowHasValues(row);
     if (shouldSkipEntireRow) continue;
 
     row.forEach((cellValue, columnIndex) => {
       if (cellValue) {
-        const rowWithNotEmptyCellAbove = getFirstRowWithValue(
-          clonedBoard,
-          columnIndex,
-          rowIndex
-        );
-
-        const allCellsAboveAreEmpty = rowWithNotEmptyCellAbove === null;
-
-        if (allCellsAboveAreEmpty) {
-          clonedBoard[0][columnIndex] = cellValue;
-          row[columnIndex] = null;
-          return;
-        }
-
-        const shouldMerge =
-          rowWithNotEmptyCellAbove !== null &&
-          clonedBoard[rowWithNotEmptyCellAbove][columnIndex] === cellValue;
-
-        if (shouldMerge) {
-          clonedBoard[rowWithNotEmptyCellAbove][columnIndex] = cellValue * 2;
-          row[columnIndex] = null;
-          return;
-        }
-        if (rowWithNotEmptyCellAbove + 1 === rowIndex) {
-          return;
-        }
-
-        const indexOfRowBelowCellWithValue = rowWithNotEmptyCellAbove + 1;
-        clonedBoard[indexOfRowBelowCellWithValue][columnIndex] = cellValue;
-        row[columnIndex] = null;
-      }
-    });
-  }
-
-  return clonedBoard;
-};
-export const moveDown = (board) => {
-  const clonedBoard = [...board];
-
-  // Start from second to last row and move upwards
-  for (let rowIndex = GRID_SIZE - 2; rowIndex >= 0; rowIndex--) {
-    const row = clonedBoard[rowIndex];
-    const shouldSkipEntireRow = !rowHasValues(row);
-    if (shouldSkipEntireRow) continue;
-
-    row.forEach((cellValue, columnIndex) => {
-      if (cellValue) {
-        const rowWithNotEmptyCellBelow = getFirstRowWithValue(
+        const rowWithNotEmptyCell = getFirstRowWithValue(
           clonedBoard,
           columnIndex,
           rowIndex,
-          true // Added parameter to search downwards
+          isMovingDown
         );
 
-        const allCellsBelowAreEmpty = rowWithNotEmptyCellBelow === null;
+        const allCellsAreEmpty = rowWithNotEmptyCell === null;
 
-        if (allCellsBelowAreEmpty) {
-          clonedBoard[GRID_SIZE - 1][columnIndex] = cellValue;
+        if (allCellsAreEmpty) {
+          const targetRowIndex = isMovingDown ? GRID_SIZE - 1 : 0;
+          clonedBoard[targetRowIndex][columnIndex] = cellValue;
           row[columnIndex] = null;
           return;
         }
 
         const shouldMerge =
-          rowWithNotEmptyCellBelow !== null &&
-          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] === cellValue;
+          rowWithNotEmptyCell !== null &&
+          clonedBoard[rowWithNotEmptyCell][columnIndex] === cellValue;
 
         if (shouldMerge) {
-          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] = cellValue * 2;
+          clonedBoard[rowWithNotEmptyCell][columnIndex] = cellValue * 2;
           row[columnIndex] = null;
           return;
         }
-        if (rowWithNotEmptyCellBelow - 1 === rowIndex) {
+        if (
+          (isMovingDown ? rowWithNotEmptyCell - 1 : rowWithNotEmptyCell + 1) ===
+          rowIndex
+        ) {
           return;
         }
 
-        const indexOfRowAboveCellWithValue = rowWithNotEmptyCellBelow - 1;
-        clonedBoard[indexOfRowAboveCellWithValue][columnIndex] = cellValue;
+        const targetRowIndex = isMovingDown
+          ? rowWithNotEmptyCell - 1
+          : rowWithNotEmptyCell + 1;
+        clonedBoard[targetRowIndex][columnIndex] = cellValue;
         row[columnIndex] = null;
       }
     });
@@ -138,6 +109,15 @@ export const moveDown = (board) => {
 
   return clonedBoard;
 };
+
+export const moveUp = (board) => {
+  return moveInDirection(board, false);
+};
+
+export const moveDown = (board) => {
+  return moveInDirection(board, true);
+};
+
 export const moveLeft = (board) => {
   const clonedBoard = [...board];
 };
