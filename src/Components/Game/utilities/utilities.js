@@ -180,19 +180,24 @@ export const moveLeft = (board) => {
       // [8, 4, null, null, null, null]
       // to sie robi
       // [8, null, null, 4, null, null]
-      // debugger;
+      debugger;
+
       const shouldMerge =
         indexOfColumnWithNotEmptyValue !== -1 &&
         clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] === cellValue;
 
       if (shouldMerge) {
-        const firstAvailableSpaceIndex =
-          indexOfColumnWithNotEmptyValue === 1
-            ? 0
-            : indexOfColumnWithNotEmptyValue;
-        clonedBoard[rowIndex][firstAvailableSpaceIndex] = cellValue * 2;
+        //first merge without moving
+        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] = cellValue * 2;
         row[columnIndex] = null;
-        row[indexOfColumnWithNotEmptyValue] = null;
+
+        //then move to the left
+        const numbers = row.filter((item) => item !== null);
+        const nulls = Array.from(
+          { length: row.length - numbers.length },
+          () => null
+        );
+        clonedBoard[rowIndex] = [...numbers, ...nulls];
 
         return;
       }
