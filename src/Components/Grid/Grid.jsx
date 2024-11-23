@@ -2,7 +2,7 @@ import { Fragment as Row } from "react";
 import { Cell } from "../Cell";
 import { GridContainer } from "./Grid.styles";
 
-export const Grid = ({ board, setBoard }) => {
+export const Grid = ({ board }) => {
   return (
     <GridContainer>
       {board.map((row, rowIndex) => (

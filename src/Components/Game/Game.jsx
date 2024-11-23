@@ -58,5 +58,5 @@ export const Game = () => {
     };
   }, []);
 
-  return <Grid board={board} setBoard={setBoard} />;
+  return <Grid board={board} />;
 };

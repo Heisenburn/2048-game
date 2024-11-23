@@ -160,12 +160,12 @@ export const moveLeft = (board) => {
       if (!cellValue || shouldSkipFirstColumn) {
         continue;
       }
-      const columnOnLeftWithValue = getIndexOfFirstNonEmptyCell(
+      const indexOfColumnWithNotEmptyValue = getIndexOfFirstNonEmptyCell(
         row,
         columnIndex
       );
 
-      const allCellsOnLeftAreEmpty = columnOnLeftWithValue === -1;
+      const allCellsOnLeftAreEmpty = indexOfColumnWithNotEmptyValue === -1;
 
       if (allCellsOnLeftAreEmpty) {
         row[0] = cellValue;
@@ -174,25 +174,38 @@ export const moveLeft = (board) => {
         return;
       }
 
+      //TODO: przesuniecie na maxa w lewo gdy mamy
+      // [8, null, null, 2, 2, null]
+      //to zamiast zrobic
+      // [8, 4, null, null, null, null]
+      // to sie robi
+      // [8, null, null, 4, null, null]
+      // debugger;
       const shouldMerge =
-        columnOnLeftWithValue !== -1 &&
-        clonedBoard[rowIndex][columnOnLeftWithValue] === cellValue;
+        indexOfColumnWithNotEmptyValue !== -1 &&
+        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] === cellValue;
 
       if (shouldMerge) {
-        clonedBoard[rowIndex][columnOnLeftWithValue] = cellValue * 2;
+        const firstAvailableSpaceIndex =
+          indexOfColumnWithNotEmptyValue === 1
+            ? 0
+            : indexOfColumnWithNotEmptyValue;
+        clonedBoard[rowIndex][firstAvailableSpaceIndex] = cellValue * 2;
         row[columnIndex] = null;
+        row[indexOfColumnWithNotEmptyValue] = null;
+
         return;
       }
 
       const shouldSkipMove =
         row.slice(0, columnIndex).every((cell) => !!cell) &&
-        columnOnLeftWithValue !== -1;
+        indexOfColumnWithNotEmptyValue !== -1;
 
       if (shouldSkipMove) {
         return;
       }
 
-      const targetColumnIndex = columnOnLeftWithValue + 1;
+      const targetColumnIndex = indexOfColumnWithNotEmptyValue + 1;
       clonedBoard[rowIndex][targetColumnIndex] = cellValue;
       row[columnIndex] = null;
     }
