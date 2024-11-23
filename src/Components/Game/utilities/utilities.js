@@ -53,21 +53,13 @@ const getFirstRowWithValue = (
   board,
   columnIndex,
   rowIndex,
-  searchDown = false,
-  searchLeft = false
+  searchDown = false
 ) => {
   if (searchDown) {
     // Search downwards from the current row
     for (let row = rowIndex + 1; row < GRID_SIZE; row++) {
       if (board[row][columnIndex] !== null) {
         return row;
-      }
-    }
-  } else if (searchLeft) {
-    // Search leftwards from the current column
-    for (let col = columnIndex - 1; col >= 0; col--) {
-      if (board[rowIndex][col] !== null) {
-        return col;
       }
     }
   } else {
@@ -160,20 +152,21 @@ export const moveLeft = (board) => {
     //move from right to left thus starting from last column (GRID-SIZE - 1)
     for (let columnIndex = GRID_SIZE - 1; columnIndex >= 0; columnIndex--) {
       const cellValue = row[columnIndex];
-      if (cellValue) {
-        const columnWithNotEmptyCell = getFirstRowWithValue(
-          clonedBoard,
-          columnIndex,
-          rowIndex,
-          false,
-          true
-        );
-        console.log(columnWithNotEmptyCell);
+      //skip first column
+      if (cellValue && columnIndex !== 0) {
+        let columnWithNotEmptyCell = null;
+
+        // [null, null, 2, null, null, null];
+        row.forEach((cellValue, index) => {
+          if (cellValue !== null && index !== columnIndex) {
+            columnWithNotEmptyCell = index;
+          }
+        });
 
         const allCellsOnLeftAreEmpty = columnWithNotEmptyCell === null;
 
         if (allCellsOnLeftAreEmpty) {
-          clonedBoard[rowIndex][0] = cellValue;
+          row[0] = cellValue;
           row[columnIndex] = null;
 
           return;
@@ -188,6 +181,10 @@ export const moveLeft = (board) => {
           row[columnIndex] = null;
           return;
         }
+
+        const targetColumnIndex = columnWithNotEmptyCell + 1;
+        clonedBoard[rowIndex][targetColumnIndex] = cellValue;
+        row[columnIndex] = null;
       }
     }
   });
