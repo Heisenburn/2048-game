@@ -15,11 +15,14 @@ export const Game = () => {
   const [board, setBoard] = useState(INITIAL_BOARD);
 
   const handleKeyDown = (event) => {
+    let timeoutId;
+
     const moveAndSpawn = (moveFunction) => {
       const newBoard = moveFunction(board);
       setBoard(newBoard);
 
-      setTimeout(() => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
         const newBoardWithTile = spawnNewTile(newBoard);
         setBoard(newBoardWithTile);
       }, 300);
@@ -41,6 +44,8 @@ export const Game = () => {
       default:
         break;
     }
+
+    return () => clearTimeout(timeoutId);
   };
 
   useEffect(() => {

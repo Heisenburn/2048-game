@@ -76,56 +76,46 @@ const rowHasValues = (row) => {
   return row.some((cell) => cell !== null);
 };
 
-const moveVertically = (board, isMovingDown) => {
+export const moveUp = (board) => {
   const clonedBoard = [...board];
-  const startIndex = isMovingDown ? GRID_SIZE - 2 : 1;
-  const endIndex = isMovingDown ? -1 : GRID_SIZE;
-  const step = isMovingDown ? -1 : 1;
 
-  for (let rowIndex = startIndex; rowIndex !== endIndex; rowIndex += step) {
+  // Start from index 1 to skip first row
+  for (let rowIndex = 1; rowIndex < GRID_SIZE; rowIndex++) {
     const row = clonedBoard[rowIndex];
     const shouldSkipEntireRow = !rowHasValues(row);
     if (shouldSkipEntireRow) continue;
 
     row.forEach((cellValue, columnIndex) => {
       if (cellValue) {
-        const rowWithNotEmptyCell = getFirstRowWithValue(
+        const rowWithNotEmptyCellAbove = getFirstRowWithValue(
           clonedBoard,
           columnIndex,
-          rowIndex,
-          isMovingDown
+          rowIndex
         );
 
-        const allCellsBelowOrAboveAreEmpty = rowWithNotEmptyCell === null;
+        const allCellsAboveAreEmpty = rowWithNotEmptyCellAbove === null;
 
-        if (allCellsBelowOrAboveAreEmpty) {
-          const targetRowIndex = isMovingDown ? GRID_SIZE - 1 : 0;
-          clonedBoard[targetRowIndex][columnIndex] = cellValue;
+        if (allCellsAboveAreEmpty) {
+          clonedBoard[0][columnIndex] = cellValue;
           row[columnIndex] = null;
           return;
         }
 
         const shouldMerge =
-          rowWithNotEmptyCell !== null &&
-          clonedBoard[rowWithNotEmptyCell][columnIndex] === cellValue;
+          rowWithNotEmptyCellAbove !== null &&
+          clonedBoard[rowWithNotEmptyCellAbove][columnIndex] === cellValue;
 
         if (shouldMerge) {
-          clonedBoard[rowWithNotEmptyCell][columnIndex] = cellValue * 2;
+          clonedBoard[rowWithNotEmptyCellAbove][columnIndex] = cellValue * 2;
           row[columnIndex] = null;
           return;
         }
-        const shouldSkipMove =
-          (isMovingDown ? rowWithNotEmptyCell - 1 : rowWithNotEmptyCell + 1) ===
-          rowIndex;
-
-        if (shouldSkipMove) {
+        if (rowWithNotEmptyCellAbove + 1 === rowIndex) {
           return;
         }
 
-        const targetRowIndex = isMovingDown
-          ? rowWithNotEmptyCell - 1
-          : rowWithNotEmptyCell + 1;
-        clonedBoard[targetRowIndex][columnIndex] = cellValue;
+        const indexOfRowBelowCellWithValue = rowWithNotEmptyCellAbove + 1;
+        clonedBoard[indexOfRowBelowCellWithValue][columnIndex] = cellValue;
         row[columnIndex] = null;
       }
     });
@@ -134,12 +124,47 @@ const moveVertically = (board, isMovingDown) => {
   return clonedBoard;
 };
 
-export const moveUp = (board) => {
-  return moveVertically(board, false);
-};
-
 export const moveDown = (board) => {
-  return moveVertically(board, true);
+  const clonedBoard = [...board];
+  // Start from second to last row and move upwards
+  for (let rowIndex = GRID_SIZE - 2; rowIndex >= 0; rowIndex--) {
+    const row = clonedBoard[rowIndex];
+    const shouldSkipEntireRow = !rowHasValues(row);
+    if (shouldSkipEntireRow) continue;
+    row.forEach((cellValue, columnIndex) => {
+      if (cellValue) {
+        const rowWithNotEmptyCellBelow = getFirstRowWithValue(
+          clonedBoard,
+          columnIndex,
+          rowIndex,
+          true // Added parameter to search downwards
+        );
+        const allCellsBelowAreEmpty = rowWithNotEmptyCellBelow === null;
+        if (allCellsBelowAreEmpty) {
+          clonedBoard[GRID_SIZE - 1][columnIndex] = cellValue;
+          row[columnIndex] = null;
+          return;
+        }
+
+        const shouldMerge =
+          rowWithNotEmptyCellBelow !== null &&
+          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] === cellValue;
+        if (shouldMerge) {
+          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] = cellValue * 2;
+          row[columnIndex] = null;
+          return;
+        }
+        if (rowWithNotEmptyCellBelow - 1 === rowIndex) {
+          return;
+        }
+        const indexOfRowAboveCellWithValue = rowWithNotEmptyCellBelow - 1;
+        clonedBoard[indexOfRowAboveCellWithValue][columnIndex] = cellValue;
+        row[columnIndex] = null;
+      }
+    });
+  }
+
+  return clonedBoard;
 };
 
 const getIndexOfFirstNonEmptyCell = (row, columnIndex) => {
@@ -179,7 +204,6 @@ export const moveLeft = (board) => {
         clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] === cellValue;
 
       if (shouldMerge) {
-        debugger;
         //first merge without moving
         clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] = cellValue * 2;
         row[columnIndex] = null;
