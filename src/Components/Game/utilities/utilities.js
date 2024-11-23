@@ -142,6 +142,10 @@ export const moveDown = (board) => {
   return moveVertically(board, true);
 };
 
+const getIndexOfFirstNonEmptyCell = (row, columnIndex) => {
+  return row.slice(0, columnIndex).findIndex((cell) => cell !== null);
+};
+
 export const moveLeft = (board) => {
   const clonedBoard = [...board];
 
@@ -152,40 +156,37 @@ export const moveLeft = (board) => {
     //move from right to left thus starting from last column (GRID-SIZE - 1)
     for (let columnIndex = GRID_SIZE - 1; columnIndex >= 0; columnIndex--) {
       const cellValue = row[columnIndex];
-      //skip first column
-      if (cellValue && columnIndex !== 0) {
-        let columnWithNotEmptyCell = null;
-
-        // [null, null, 2, null, null, null];
-        row.forEach((cellValue, index) => {
-          if (cellValue !== null && index !== columnIndex) {
-            columnWithNotEmptyCell = index;
-          }
-        });
-
-        const allCellsOnLeftAreEmpty = columnWithNotEmptyCell === null;
-
-        if (allCellsOnLeftAreEmpty) {
-          row[0] = cellValue;
-          row[columnIndex] = null;
-
-          return;
-        }
-
-        const shouldMerge =
-          columnWithNotEmptyCell !== null &&
-          clonedBoard[rowIndex][columnWithNotEmptyCell] === cellValue;
-
-        if (shouldMerge) {
-          clonedBoard[rowIndex][columnWithNotEmptyCell] = cellValue * 2;
-          row[columnIndex] = null;
-          return;
-        }
-
-        const targetColumnIndex = columnWithNotEmptyCell + 1;
-        clonedBoard[rowIndex][targetColumnIndex] = cellValue;
-        row[columnIndex] = null;
+      const shouldSkipFirstColumn = columnIndex === 0;
+      if (!cellValue || shouldSkipFirstColumn) {
+        continue;
       }
+      const columnOnLeftWithValue = getIndexOfFirstNonEmptyCell(
+        row,
+        columnIndex
+      );
+
+      const allCellsOnLeftAreEmpty = columnOnLeftWithValue === -1;
+
+      if (allCellsOnLeftAreEmpty) {
+        row[0] = cellValue;
+        row[columnIndex] = null;
+
+        return;
+      }
+
+      const shouldMerge =
+        columnOnLeftWithValue !== null &&
+        clonedBoard[rowIndex][columnOnLeftWithValue] === cellValue;
+
+      if (shouldMerge) {
+        clonedBoard[rowIndex][columnOnLeftWithValue] = cellValue * 2;
+        row[columnIndex] = null;
+        return;
+      }
+
+      const targetColumnIndex = columnOnLeftWithValue + 1;
+      clonedBoard[rowIndex][targetColumnIndex] = cellValue;
+      row[columnIndex] = null;
     }
   });
 
