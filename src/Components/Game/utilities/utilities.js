@@ -91,10 +91,11 @@ const moveInDirection = (board, isMovingDown) => {
           row[columnIndex] = null;
           return;
         }
-        if (
+        const shouldSkipMove =
           (isMovingDown ? rowWithNotEmptyCell - 1 : rowWithNotEmptyCell + 1) ===
-          rowIndex
-        ) {
+          rowIndex;
+
+        if (shouldSkipMove) {
           return;
         }
 
