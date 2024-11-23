@@ -143,7 +143,7 @@ export const moveDown = (board) => {
 };
 
 const getIndexOfFirstNonEmptyCell = (row, columnIndex) => {
-  return row.slice(0, columnIndex).findIndex((cell) => cell !== null);
+  return row.slice(0, columnIndex).findLastIndex((cell) => cell !== null);
 };
 
 export const moveLeft = (board) => {
@@ -175,12 +175,20 @@ export const moveLeft = (board) => {
       }
 
       const shouldMerge =
-        columnOnLeftWithValue !== null &&
+        columnOnLeftWithValue !== -1 &&
         clonedBoard[rowIndex][columnOnLeftWithValue] === cellValue;
 
       if (shouldMerge) {
         clonedBoard[rowIndex][columnOnLeftWithValue] = cellValue * 2;
         row[columnIndex] = null;
+        return;
+      }
+
+      const shouldSkipMove =
+        row.slice(0, columnIndex).every((cell) => !!cell) &&
+        columnOnLeftWithValue !== -1;
+
+      if (shouldSkipMove) {
         return;
       }
 
