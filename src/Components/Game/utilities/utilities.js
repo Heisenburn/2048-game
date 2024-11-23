@@ -26,17 +26,48 @@ export const generateInitialBoard = () => {
   return board;
 };
 
+export const spawnNewTile = (board) => {
+  const newBoard = [...board];
+  const { randomRow, randomCol } = getRandomCellCoordinates();
+
+  let tempRandomRow = randomRow;
+  let tempRandomCol = randomCol;
+
+  let isEmptyTileFound = false;
+
+  while (!isEmptyTileFound) {
+    const isCellEmpty = board[tempRandomRow][tempRandomCol] === null;
+    if (isCellEmpty) {
+      isEmptyTileFound = true;
+    } else {
+      tempRandomRow = getRandomCellCoordinates().randomRow;
+      tempRandomCol = getRandomCellCoordinates().randomCol;
+    }
+  }
+
+  newBoard[tempRandomRow][tempRandomCol] = INITIAL_CELL_VALUE;
+  return newBoard;
+};
+
 const getFirstRowWithValue = (
   board,
   columnIndex,
   rowIndex,
-  searchDown = false
+  searchDown = false,
+  searchLeft = false
 ) => {
   if (searchDown) {
     // Search downwards from the current row
     for (let row = rowIndex + 1; row < GRID_SIZE; row++) {
       if (board[row][columnIndex] !== null) {
         return row;
+      }
+    }
+  } else if (searchLeft) {
+    // Search leftwards from the current column
+    for (let col = columnIndex - 1; col >= 0; col--) {
+      if (board[rowIndex][col] !== null) {
+        return col;
       }
     }
   } else {
@@ -53,7 +84,7 @@ const rowHasValues = (row) => {
   return row.some((cell) => cell !== null);
 };
 
-const moveInDirection = (board, isMovingDown) => {
+const moveVertically = (board, isMovingDown) => {
   const clonedBoard = [...board];
   const startIndex = isMovingDown ? GRID_SIZE - 2 : 1;
   const endIndex = isMovingDown ? -1 : GRID_SIZE;
@@ -73,9 +104,9 @@ const moveInDirection = (board, isMovingDown) => {
           isMovingDown
         );
 
-        const allCellsAreEmpty = rowWithNotEmptyCell === null;
+        const allCellsBelowOrAboveAreEmpty = rowWithNotEmptyCell === null;
 
-        if (allCellsAreEmpty) {
+        if (allCellsBelowOrAboveAreEmpty) {
           const targetRowIndex = isMovingDown ? GRID_SIZE - 1 : 0;
           clonedBoard[targetRowIndex][columnIndex] = cellValue;
           row[columnIndex] = null;
@@ -112,15 +143,46 @@ const moveInDirection = (board, isMovingDown) => {
 };
 
 export const moveUp = (board) => {
-  return moveInDirection(board, false);
+  return moveVertically(board, false);
 };
 
 export const moveDown = (board) => {
-  return moveInDirection(board, true);
+  return moveVertically(board, true);
 };
 
 export const moveLeft = (board) => {
   const clonedBoard = [...board];
+
+  clonedBoard.forEach((row, rowIndex) => {
+    const shouldSkipEntireRow = !rowHasValues(row);
+    if (shouldSkipEntireRow) return;
+
+    //move from right to left thus starting from last column (GRID-SIZE - 1)
+    for (let columnIndex = GRID_SIZE - 1; columnIndex >= 0; columnIndex--) {
+      const cellValue = row[columnIndex];
+      if (cellValue) {
+        const columnWithNotEmptyCell = getFirstRowWithValue(
+          clonedBoard,
+          columnIndex,
+          rowIndex,
+          false,
+          true
+        );
+        console.log(columnWithNotEmptyCell);
+
+        const allCellsOnLeftAreEmpty = columnWithNotEmptyCell === null;
+
+        if (allCellsOnLeftAreEmpty) {
+          clonedBoard[rowIndex][0] = cellValue;
+          clonedBoard[rowIndex][columnIndex] = null;
+
+          continue;
+        }
+      }
+    }
+  });
+
+  return clonedBoard;
 };
 
 export const moveRight = (board) => {
