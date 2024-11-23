@@ -174,9 +174,19 @@ export const moveLeft = (board) => {
 
         if (allCellsOnLeftAreEmpty) {
           clonedBoard[rowIndex][0] = cellValue;
-          clonedBoard[rowIndex][columnIndex] = null;
+          row[columnIndex] = null;
 
-          continue;
+          return;
+        }
+
+        const shouldMerge =
+          columnWithNotEmptyCell !== null &&
+          clonedBoard[rowIndex][columnWithNotEmptyCell] === cellValue;
+
+        if (shouldMerge) {
+          clonedBoard[rowIndex][columnWithNotEmptyCell] = cellValue * 2;
+          row[columnIndex] = null;
+          return;
         }
       }
     }
