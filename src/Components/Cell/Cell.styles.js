@@ -26,5 +26,5 @@ export const CellContainer = styled.div`
   justify-content: center;
   align-items: center;
   font-weight: bold;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.5s ease;
 `;

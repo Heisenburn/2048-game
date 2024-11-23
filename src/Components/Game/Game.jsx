@@ -15,35 +15,28 @@ export const Game = () => {
   const [board, setBoard] = useState(INITIAL_BOARD);
 
   const handleKeyDown = (event) => {
+    const moveAndSpawn = (moveFunction) => {
+      const newBoard = moveFunction(board);
+      setBoard(newBoard);
+
+      setTimeout(() => {
+        const newBoardWithTile = spawnNewTile(newBoard);
+        setBoard(newBoardWithTile);
+      }, 300);
+    };
+
     switch (event.key) {
       case "ArrowUp":
-        //steps
-        const boardAfterMoveUp = moveUp(board);
-        const boardAfterMoveUpAndSpawningNewTile =
-          spawnNewTile(boardAfterMoveUp);
-
-        setBoard(boardAfterMoveUpAndSpawningNewTile);
+        moveAndSpawn(moveUp);
         break;
       case "ArrowDown":
-        const boardAfterMoveDown = moveDown(board);
-        const boardAfterMoveDownAndSpawningNewTile =
-          spawnNewTile(boardAfterMoveDown);
-
-        setBoard(boardAfterMoveDownAndSpawningNewTile);
+        moveAndSpawn(moveDown);
         break;
       case "ArrowLeft":
-        const boardAfterMoveLeft = moveLeft(board);
-        const boardAfterMoveLeftAndSpawningNewTile =
-          spawnNewTile(boardAfterMoveLeft);
-
-        setBoard(boardAfterMoveLeftAndSpawningNewTile);
+        moveAndSpawn(moveLeft);
         break;
       case "ArrowRight":
-        const boardAfterMoveRight = moveRight(board);
-        const boardAfterMoveRightAndSpawningNewTile =
-          spawnNewTile(boardAfterMoveRight);
-
-        setBoard(boardAfterMoveRightAndSpawningNewTile);
+        moveAndSpawn(moveRight);
         break;
       default:
         break;

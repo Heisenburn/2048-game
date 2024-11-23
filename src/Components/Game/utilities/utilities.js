@@ -174,19 +174,12 @@ export const moveLeft = (board) => {
         return;
       }
 
-      //TODO: przesuniecie na maxa w lewo gdy mamy
-      // [8, null, null, 2, 2, null]
-      //to zamiast zrobic
-      // [8, 4, null, null, null, null]
-      // to sie robi
-      // [8, null, null, 4, null, null]
-      debugger;
-
       const shouldMerge =
         indexOfColumnWithNotEmptyValue !== -1 &&
         clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] === cellValue;
 
       if (shouldMerge) {
+        debugger;
         //first merge without moving
         clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] = cellValue * 2;
         row[columnIndex] = null;
