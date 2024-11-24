@@ -169,10 +169,6 @@ export const moveDown = (board) => {
   return clonedBoard;
 };
 
-const getIndexOfFirstNonEmptyCell = (row, columnIndex) => {
-  return row.slice(0, columnIndex).findLastIndex((cell) => cell !== null);
-};
-
 export const moveLeft = (board) => {
   const clonedBoard = [...board];
 
@@ -187,10 +183,9 @@ export const moveLeft = (board) => {
       if (!cellValue || shouldSkipFirstColumn) {
         continue;
       }
-      const indexOfColumnWithNotEmptyValue = getIndexOfFirstNonEmptyCell(
-        row,
-        columnIndex
-      );
+      const indexOfColumnWithNotEmptyValue = row
+        .slice(0, columnIndex)
+        .findLastIndex((cell) => cell !== null);
 
       const allCellsOnLeftAreEmpty = indexOfColumnWithNotEmptyValue === -1;
 
@@ -240,4 +235,65 @@ export const moveLeft = (board) => {
 
 export const moveRight = (board) => {
   const clonedBoard = [...board];
+
+  clonedBoard.forEach((row, rowIndex) => {
+    const shouldSkipEntireRow = !rowHasValues(row);
+    if (shouldSkipEntireRow) return;
+
+    // Move from left to right thus starting from first column (0)
+    for (let columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++) {
+      const cellValue = row[columnIndex];
+      const shouldSkipLastColumn = columnIndex === GRID_SIZE - 1;
+      if (!cellValue || shouldSkipLastColumn) {
+        continue;
+      }
+      const indexOfColumnWithNotEmptyValue = !rowHasValues(
+        row.slice(columnIndex + 1, row.length)
+      )
+        ? -1
+        : row.findLastIndex((cell) => cell !== null);
+      const allCellsOnRightAreEmpty = indexOfColumnWithNotEmptyValue === -1;
+
+      if (allCellsOnRightAreEmpty) {
+        row[GRID_SIZE - 1] = cellValue;
+        row[columnIndex] = null;
+
+        return;
+      }
+
+      const shouldMerge =
+        indexOfColumnWithNotEmptyValue !== -1 &&
+        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] === cellValue;
+
+      if (shouldMerge) {
+        // First merge without moving
+        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] = cellValue * 2;
+        row[columnIndex] = null;
+
+        // Then move to the right
+        const numbers = row.filter((item) => item !== null);
+        const nulls = Array.from(
+          { length: row.length - numbers.length },
+          () => null
+        );
+        clonedBoard[rowIndex] = [...nulls, ...numbers];
+
+        return;
+      }
+
+      const shouldSkipMove =
+        row.slice(columnIndex + 1).every((cell) => !!cell) &&
+        indexOfColumnWithNotEmptyValue !== -1;
+
+      if (shouldSkipMove) {
+        return;
+      }
+
+      const targetColumnIndex = indexOfColumnWithNotEmptyValue - 1;
+      clonedBoard[rowIndex][targetColumnIndex] = cellValue;
+      row[columnIndex] = null;
+    }
+  });
+
+  return clonedBoard;
 };
