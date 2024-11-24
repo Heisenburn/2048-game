@@ -1,17 +1,13 @@
-import { Fragment as Row } from "react";
 import { Cell } from "../Cell";
 import { GridContainer } from "./Grid.styles";
-
-export const Grid = ({ board }) => {
+export const Grid = ({ grid }) => {
   return (
     <GridContainer>
-      {board.map((row, rowIndex) => (
-        <Row key={rowIndex}>
-          {row.map((cellValue, cellIndex) => (
-            <Cell key={cellIndex} value={cellValue} />
-          ))}
-        </Row>
-      ))}
+      {grid.map((row, rowIndex) =>
+        row.map((cell, columnIndex) => (
+          <Cell key={`${rowIndex}-${columnIndex}`} value={cell} />
+        ))
+      )}
     </GridContainer>
   );
 };

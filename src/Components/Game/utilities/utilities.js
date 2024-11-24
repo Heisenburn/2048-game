@@ -1,299 +1,168 @@
-import { GRID_SIZE, INITIAL_CELL_VALUE } from "../constants";
+import { GRID_SIZE, INITIAL_CELL_VALUE } from "../constants/constants";
 
-export const getRandomCellCoordinates = () => {
-  //get random place from 0 to 6
-  const randomRow = Math.floor(Math.random() * GRID_SIZE);
-  const randomCol = Math.floor(Math.random() * GRID_SIZE);
-  return { randomRow, randomCol };
-};
-
-export const generateInitialBoard = () => {
-  // [
-  //   [null, null, null, null, null, null],
-  //   [null, 2 (random), null, null, null, null],
-  //   [null, null, null, null, null, null],
-  //   [null, null, null, null, null, null],
-  //   [null, null, null, null, null, null],
-  //   [null, null, null, null, null, null],
-  // ];
-  const board = Array.from({ length: GRID_SIZE }, () =>
-    Array(GRID_SIZE).fill(null)
-  );
-
-  const { randomRow, randomCol } = getRandomCellCoordinates();
-  board[randomRow][randomCol] = INITIAL_CELL_VALUE;
-
-  return board;
-};
-
-export const spawnNewTile = (board) => {
-  const newBoard = [...board];
-  const { randomRow, randomCol } = getRandomCellCoordinates();
-
-  let tempRandomRow = randomRow;
-  let tempRandomCol = randomCol;
-
-  let isEmptyTileFound = false;
-
-  while (!isEmptyTileFound) {
-    const isCellEmpty = board[tempRandomRow][tempRandomCol] === null;
-    if (isCellEmpty) {
-      isEmptyTileFound = true;
-    } else {
-      tempRandomRow = getRandomCellCoordinates().randomRow;
-      tempRandomCol = getRandomCellCoordinates().randomCol;
-    }
-  }
-
-  newBoard[tempRandomRow][tempRandomCol] = INITIAL_CELL_VALUE;
-  return newBoard;
-};
-
-const getFirstRowWithValue = (
-  board,
-  columnIndex,
-  rowIndex,
-  searchDown = false
-) => {
-  if (searchDown) {
-    // Search downwards from the current row
-    for (let row = rowIndex + 1; row < GRID_SIZE; row++) {
-      if (board[row][columnIndex] !== null) {
-        return row;
-      }
-    }
-  } else {
-    // upward search
-    for (let row = rowIndex - 1; row >= 0; row--) {
-      if (board[row][columnIndex] !== null) {
-        return row;
+export const addNewTile = (currentGrid) => {
+  // Find all empty cells
+  const emptyCells = [];
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      if (currentGrid[row][col] === 0) {
+        emptyCells.push({ row, col });
       }
     }
   }
-  return null;
+
+  // Add new tile if there are empty cells
+  if (emptyCells.length > 0) {
+    const randomCell =
+      emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    currentGrid[randomCell.row][randomCell.col] = INITIAL_CELL_VALUE;
+  }
+  return currentGrid;
 };
-const rowHasValues = (row) => {
-  return row.some((cell) => cell !== null);
-};
 
-export const moveUp = (board) => {
-  const clonedBoard = [...board];
-
-  // Start from index 1 to skip first row
-  for (let rowIndex = 1; rowIndex < GRID_SIZE; rowIndex++) {
-    const row = clonedBoard[rowIndex];
-    const shouldSkipEntireRow = !rowHasValues(row);
-    if (shouldSkipEntireRow) continue;
-
-    row.forEach((cellValue, columnIndex) => {
-      if (cellValue) {
-        const rowWithNotEmptyCellAbove = getFirstRowWithValue(
-          clonedBoard,
-          columnIndex,
-          rowIndex
-        );
-
-        const allCellsAboveAreEmpty = rowWithNotEmptyCellAbove === null;
-
-        if (allCellsAboveAreEmpty) {
-          clonedBoard[0][columnIndex] = cellValue;
-          row[columnIndex] = null;
-          return;
-        }
-
-        const shouldMerge =
-          rowWithNotEmptyCellAbove !== null &&
-          clonedBoard[rowWithNotEmptyCellAbove][columnIndex] === cellValue;
-
-        if (shouldMerge) {
-          clonedBoard[rowWithNotEmptyCellAbove][columnIndex] = cellValue * 2;
-          row[columnIndex] = null;
-          return;
-        }
-        const shouldSkipMove = rowWithNotEmptyCellAbove + 1 === rowIndex; //cell cannot merge and cannot move up
-        if (shouldSkipMove) {
-          return;
-        }
-
-        const indexOfRowBelowCellWithValue = rowWithNotEmptyCellAbove + 1;
-        clonedBoard[indexOfRowBelowCellWithValue][columnIndex] = cellValue;
-        row[columnIndex] = null;
+export const checkGameOver = (currentGrid) => {
+  // Game is not over if there are empty cells
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      if (currentGrid[row][col] === 0) {
+        return false;
       }
-    });
+    }
   }
 
-  return clonedBoard;
-};
+  // Game is not over if there are possible merges
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      const hasDownwardMerge =
+        row < GRID_SIZE - 1 &&
+        currentGrid[row][col] === currentGrid[row + 1][col];
+      const hasRightwardMerge =
+        col < GRID_SIZE - 1 &&
+        currentGrid[row][col] === currentGrid[row][col + 1];
 
-export const moveDown = (board) => {
-  const clonedBoard = [...board];
-  // Start from second to last row and move upwards
-  for (let rowIndex = GRID_SIZE - 2; rowIndex >= 0; rowIndex--) {
-    const row = clonedBoard[rowIndex];
-    const shouldSkipEntireRow = !rowHasValues(row);
-    if (shouldSkipEntireRow) continue;
-    row.forEach((cellValue, columnIndex) => {
-      if (cellValue) {
-        const rowWithNotEmptyCellBelow = getFirstRowWithValue(
-          clonedBoard,
-          columnIndex,
-          rowIndex,
-          true
-        );
-        const allCellsBelowAreEmpty = rowWithNotEmptyCellBelow === null;
-        if (allCellsBelowAreEmpty) {
-          clonedBoard[GRID_SIZE - 1][columnIndex] = cellValue;
-          row[columnIndex] = null;
-          return;
-        }
-
-        const shouldMerge =
-          rowWithNotEmptyCellBelow !== null &&
-          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] === cellValue;
-        if (shouldMerge) {
-          clonedBoard[rowWithNotEmptyCellBelow][columnIndex] = cellValue * 2;
-          row[columnIndex] = null;
-          return;
-        }
-        const shouldSkipMove = rowWithNotEmptyCellBelow - 1 === rowIndex; //cell cannot merge and cannot move down
-        if (shouldSkipMove) {
-          return;
-        }
-        const indexOfRowAboveCellWithValue = rowWithNotEmptyCellBelow - 1;
-        clonedBoard[indexOfRowAboveCellWithValue][columnIndex] = cellValue;
-        row[columnIndex] = null;
+      if (hasDownwardMerge || hasRightwardMerge) {
+        return false;
       }
-    });
+    }
   }
 
-  return clonedBoard;
+  return true;
 };
 
-export const moveLeft = (board) => {
-  const clonedBoard = [...board];
+export const getBoardAfterMove = (direction, grid, gameOver) => {
+  if (gameOver) return;
 
-  clonedBoard.forEach((row, rowIndex) => {
-    const shouldSkipEntireRow = !rowHasValues(row);
-    if (shouldSkipEntireRow) return;
+  let newGrid = grid.map((row) => [...row]);
 
-    //move from right to left thus starting from last column (GRID-SIZE - 1)
-    for (let columnIndex = GRID_SIZE - 1; columnIndex >= 0; columnIndex--) {
-      const cellValue = row[columnIndex];
-      const shouldSkipFirstColumn = columnIndex === 0;
-      if (!cellValue || shouldSkipFirstColumn) {
-        continue;
-      }
-      const indexOfColumnWithNotEmptyValue = row
-        .slice(0, columnIndex)
-        .findLastIndex((cell) => cell !== null);
+  const isMovingCellPossible = (fromRow, fromCol, toRow, toCol) => {
+    const sourceValue = newGrid[fromRow][fromCol];
+    const targetValue = newGrid[toRow][toCol];
 
-      const allCellsOnLeftAreEmpty = indexOfColumnWithNotEmptyValue === -1;
+    if (sourceValue === 0) return false;
 
-      if (allCellsOnLeftAreEmpty) {
-        row[0] = cellValue;
-        row[columnIndex] = null;
-
-        return;
-      }
-
-      const shouldMerge =
-        indexOfColumnWithNotEmptyValue !== -1 &&
-        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] === cellValue;
-
-      if (shouldMerge) {
-        //first merge without moving
-        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] = cellValue * 2;
-        row[columnIndex] = null;
-
-        //then move to the left
-        const numbers = row.filter((item) => item !== null);
-        const nulls = Array.from(
-          { length: row.length - numbers.length },
-          () => null
-        );
-        clonedBoard[rowIndex] = [...numbers, ...nulls];
-
-        return;
-      }
-
-      const shouldSkipMove =
-        row.slice(0, columnIndex).every((cell) => !!cell) &&
-        indexOfColumnWithNotEmptyValue !== -1;
-
-      if (shouldSkipMove) {
-        return;
-      }
-
-      const targetColumnIndex = indexOfColumnWithNotEmptyValue + 1;
-      clonedBoard[rowIndex][targetColumnIndex] = cellValue;
-      row[columnIndex] = null;
+    if (targetValue === 0) {
+      // Move to empty cell
+      newGrid[toRow][toCol] = sourceValue;
+      newGrid[fromRow][fromCol] = 0;
+      return true;
     }
-  });
 
-  return clonedBoard;
-};
-
-export const moveRight = (board) => {
-  const clonedBoard = [...board];
-
-  clonedBoard.forEach((row, rowIndex) => {
-    const shouldSkipEntireRow = !rowHasValues(row);
-    if (shouldSkipEntireRow) return;
-
-    //TODO: [null, null, 2,2,2] powinny zmergowac sie najbardziej po prawej
-
-    for (let columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++) {
-      const cellValue = row[columnIndex];
-      const shouldSkipLastColumn = columnIndex === GRID_SIZE - 1;
-      if (!cellValue || shouldSkipLastColumn) {
-        continue;
-      }
-      const indexOfClosestNotEmptyCellOnRight = row.findIndex(
-        (cell, index) => cell !== null && index > columnIndex
-      );
-      const allCellsOnRightAreEmpty = indexOfClosestNotEmptyCellOnRight === -1;
-
-      if (allCellsOnRightAreEmpty) {
-        row[GRID_SIZE - 1] = cellValue;
-        row[columnIndex] = null;
-
-        return;
-      }
-
-      const shouldMerge =
-        indexOfClosestNotEmptyCellOnRight !== -1 &&
-        clonedBoard[rowIndex][indexOfClosestNotEmptyCellOnRight] === cellValue;
-
-      if (shouldMerge) {
-        // First merge without moving
-        clonedBoard[rowIndex][indexOfClosestNotEmptyCellOnRight] =
-          cellValue * 2;
-        row[columnIndex] = null;
-
-        // Then move to the right
-        const numbers = row.filter((item) => item !== null);
-        const nulls = Array.from(
-          { length: row.length - numbers.length },
-          () => null
-        );
-        clonedBoard[rowIndex] = [...nulls, ...numbers];
-
-        return;
-      }
-
-      const shouldSkipMove =
-        row.slice(columnIndex + 1).every((cell) => !!cell) &&
-        indexOfClosestNotEmptyCellOnRight !== -1;
-
-      if (shouldSkipMove) {
-        return;
-      }
-
-      const targetColumnIndex = indexOfClosestNotEmptyCellOnRight - 1;
-      clonedBoard[rowIndex][targetColumnIndex] = cellValue;
-      row[columnIndex] = null;
+    if (targetValue === sourceValue) {
+      // Merge identical values
+      newGrid[toRow][toCol] = targetValue * 2;
+      newGrid[fromRow][fromCol] = 0;
+      return true;
     }
-  });
 
-  return clonedBoard;
+    return false;
+  };
+
+  // Process moves based on direction
+  switch (direction) {
+    case "up": {
+      // For each column
+      for (let col = 0; col < GRID_SIZE; col++) {
+        // Start from second row (index 1) and move upward
+        for (let row = 1; row < GRID_SIZE; row++) {
+          // If we find a non-empty cell
+          if (newGrid[row][col] !== 0) {
+            let currentRow = row;
+            // Keep moving the cell up while possible
+            while (
+              currentRow > 0 &&
+              isMovingCellPossible(currentRow, col, currentRow - 1, col)
+            ) {
+              currentRow--;
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case "down": {
+      // For each column
+      for (let col = 0; col < GRID_SIZE; col++) {
+        // Start from second-to-last row and move downward
+        for (let row = GRID_SIZE - 2; row >= 0; row--) {
+          // If we find a non-empty cell
+          if (newGrid[row][col] !== 0) {
+            let currentRow = row;
+            // Keep moving the cell down while possible
+            while (
+              currentRow < GRID_SIZE - 1 &&
+              isMovingCellPossible(currentRow, col, currentRow + 1, col)
+            ) {
+              currentRow++;
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case "left": {
+      // For each row
+      for (let row = 0; row < GRID_SIZE; row++) {
+        // Start from second column (index 1) and move leftward
+        for (let col = 1; col < GRID_SIZE; col++) {
+          // If we find a non-empty cell
+          if (newGrid[row][col] !== 0) {
+            let currentCol = col;
+            // Keep moving the cell left while possible
+            while (
+              currentCol > 0 &&
+              isMovingCellPossible(row, currentCol, row, currentCol - 1)
+            ) {
+              currentCol--;
+            }
+          }
+        }
+      }
+      break;
+    }
+
+    case "right": {
+      // For each row
+      for (let row = 0; row < GRID_SIZE; row++) {
+        // Start from second-to-last column and move rightward
+        for (let col = GRID_SIZE - 2; col >= 0; col--) {
+          // If we find a non-empty cell
+          if (newGrid[row][col] !== 0) {
+            let currentCol = col;
+            // Keep moving the cell right while possible
+            while (
+              currentCol < GRID_SIZE - 1 &&
+              isMovingCellPossible(row, currentCol, row, currentCol + 1)
+            ) {
+              currentCol++;
+            }
+          }
+        }
+      }
+      break;
+    }
+  }
+
+  return { newGrid, gameOver };
 };

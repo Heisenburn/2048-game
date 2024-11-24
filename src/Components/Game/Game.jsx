@@ -1,68 +1,79 @@
-import { useEffect, useState } from "react";
-import { Grid } from "../Grid";
+import React, { useEffect, useState } from "react";
+import { Grid } from "../Grid/Grid";
+import { GRID_SIZE } from "./constants/constants";
 import {
-  generateInitialBoard,
-  moveDown,
-  moveLeft,
-  moveRight,
-  moveUp,
-  spawnNewTile,
-} from "./utilities";
+  Container,
+  GameBoard,
+  GameOver,
+  Header,
+  NewGameButton,
+} from "./Game.styles";
+import {
+  addNewTile,
+  checkGameOver,
+  getBoardAfterMove,
+} from "./utilities/utilities";
 
-const INITIAL_BOARD = generateInitialBoard();
+const generateInitialBoard = () => {
+  const newGrid = Array(GRID_SIZE)
+    .fill()
+    .map(() => Array(GRID_SIZE).fill(0));
+  addNewTile(newGrid);
+  return newGrid;
+};
 
-export const Game = () => {
-  //debug by setting initial board to a specific board
-  const [board, setBoard] = useState([
-    [null, null, null, 2, 2, 2],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-    [null, null, null, null, null, null],
-  ]);
+const INITIAL_GRID = generateInitialBoard();
 
-  const handleKeyDown = (event) => {
-    let timeoutId;
+const Game = () => {
+  const [grid, setGrid] = useState(INITIAL_GRID);
+  const [gameOver, setGameOver] = useState(false);
 
-    const moveAndSpawn = (moveFunction) => {
-      const newBoard = moveFunction(board);
-      setBoard(newBoard);
-
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        const newBoardWithTile = spawnNewTile(newBoard);
-        setBoard(newBoardWithTile);
-      }, 500);
-    };
-
-    switch (event.key) {
-      case "ArrowUp":
-        moveAndSpawn(moveUp);
-        break;
-      case "ArrowDown":
-        moveAndSpawn(moveDown);
-        break;
-      case "ArrowLeft":
-        moveAndSpawn(moveLeft);
-        break;
-      case "ArrowRight":
-        moveAndSpawn(moveRight);
-        break;
-      default:
-        break;
-    }
-
-    return () => clearTimeout(timeoutId);
+  const initializeGame = () => {
+    setGrid(generateInitialBoard());
+    setGameOver(false);
   };
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
+    const handleKeyPress = async (event) => {
+      const directions = {
+        ArrowUp: "up",
+        ArrowDown: "down",
+        ArrowLeft: "left",
+        ArrowRight: "right",
+      };
 
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      const moveDirection = directions[event.key];
+
+      if (moveDirection) {
+        const { newGrid } = getBoardAfterMove(moveDirection, grid, gameOver);
+        const updatedGrid = addNewTile(newGrid);
+        setGrid(updatedGrid);
+
+        if (checkGameOver(updatedGrid)) {
+          setGameOver(true);
+        }
+      }
     };
-  }, []);
 
-  return <Grid board={board} />;
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [grid, gameOver]);
+
+  return (
+    <Container>
+      <Header>
+        <NewGameButton onClick={initializeGame}>New Game</NewGameButton>
+      </Header>
+
+      <GameBoard>
+        <Grid grid={grid} />
+      </GameBoard>
+
+      {gameOver && (
+        <GameOver>Game Over! Click New Game to play again.</GameOver>
+      )}
+    </Container>
+  );
 };
+
+export default Game;
