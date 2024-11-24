@@ -240,19 +240,18 @@ export const moveRight = (board) => {
     const shouldSkipEntireRow = !rowHasValues(row);
     if (shouldSkipEntireRow) return;
 
-    // Move from left to right thus starting from first column (0)
+    //TODO: [null, null, 2,2,2] powinny zmergowac sie najbardziej po prawej
+
     for (let columnIndex = 0; columnIndex < GRID_SIZE; columnIndex++) {
       const cellValue = row[columnIndex];
       const shouldSkipLastColumn = columnIndex === GRID_SIZE - 1;
       if (!cellValue || shouldSkipLastColumn) {
         continue;
       }
-      const indexOfColumnWithNotEmptyValue = !rowHasValues(
-        row.slice(columnIndex + 1, row.length)
-      )
-        ? -1
-        : row.findLastIndex((cell) => cell !== null);
-      const allCellsOnRightAreEmpty = indexOfColumnWithNotEmptyValue === -1;
+      const indexOfClosestNotEmptyCellOnRight = row.findIndex(
+        (cell, index) => cell !== null && index > columnIndex
+      );
+      const allCellsOnRightAreEmpty = indexOfClosestNotEmptyCellOnRight === -1;
 
       if (allCellsOnRightAreEmpty) {
         row[GRID_SIZE - 1] = cellValue;
@@ -262,12 +261,13 @@ export const moveRight = (board) => {
       }
 
       const shouldMerge =
-        indexOfColumnWithNotEmptyValue !== -1 &&
-        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] === cellValue;
+        indexOfClosestNotEmptyCellOnRight !== -1 &&
+        clonedBoard[rowIndex][indexOfClosestNotEmptyCellOnRight] === cellValue;
 
       if (shouldMerge) {
         // First merge without moving
-        clonedBoard[rowIndex][indexOfColumnWithNotEmptyValue] = cellValue * 2;
+        clonedBoard[rowIndex][indexOfClosestNotEmptyCellOnRight] =
+          cellValue * 2;
         row[columnIndex] = null;
 
         // Then move to the right
@@ -283,13 +283,13 @@ export const moveRight = (board) => {
 
       const shouldSkipMove =
         row.slice(columnIndex + 1).every((cell) => !!cell) &&
-        indexOfColumnWithNotEmptyValue !== -1;
+        indexOfClosestNotEmptyCellOnRight !== -1;
 
       if (shouldSkipMove) {
         return;
       }
 
-      const targetColumnIndex = indexOfColumnWithNotEmptyValue - 1;
+      const targetColumnIndex = indexOfClosestNotEmptyCellOnRight - 1;
       clonedBoard[rowIndex][targetColumnIndex] = cellValue;
       row[columnIndex] = null;
     }

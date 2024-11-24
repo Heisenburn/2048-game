@@ -12,7 +12,15 @@ import {
 const INITIAL_BOARD = generateInitialBoard();
 
 export const Game = () => {
-  const [board, setBoard] = useState(INITIAL_BOARD);
+  //debug by setting initial board to a specific board
+  const [board, setBoard] = useState([
+    [null, null, null, 2, 2, 2],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+    [null, null, null, null, null, null],
+  ]);
 
   const handleKeyDown = (event) => {
     let timeoutId;
@@ -25,7 +33,7 @@ export const Game = () => {
       timeoutId = setTimeout(() => {
         const newBoardWithTile = spawnNewTile(newBoard);
         setBoard(newBoardWithTile);
-      }, 300);
+      }, 500);
     };
 
     switch (event.key) {
