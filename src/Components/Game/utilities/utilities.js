@@ -49,9 +49,7 @@ export const checkGameOver = (currentGrid) => {
   return true;
 };
 
-export const getBoardAfterMove = (direction, grid, gameOver) => {
-  if (gameOver) return;
-
+export const getBoardAfterMove = (direction, grid) => {
   let newGrid = grid.map((row) => [...row]);
   // Track merged cells
   let mergedCells = Array(GRID_SIZE)
@@ -174,5 +172,5 @@ export const getBoardAfterMove = (direction, grid, gameOver) => {
     }
   }
 
-  return { newGrid, gameOver };
+  return { newGrid };
 };

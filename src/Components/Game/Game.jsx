@@ -34,6 +34,8 @@ const Game = () => {
   };
 
   useEffect(() => {
+    if (gameOver) return;
+
     const handleKeyPress = async (event) => {
       const directions = {
         ArrowUp: "up",
@@ -45,7 +47,7 @@ const Game = () => {
       const moveDirection = directions[event.key];
 
       if (moveDirection) {
-        const { newGrid } = getBoardAfterMove(moveDirection, grid, gameOver);
+        const { newGrid } = getBoardAfterMove(moveDirection, grid);
         const updatedGrid = addNewTile(newGrid);
         setGrid(updatedGrid);
 

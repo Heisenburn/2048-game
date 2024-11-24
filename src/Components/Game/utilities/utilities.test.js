@@ -170,20 +170,6 @@ describe("Game Utilities", () => {
       expect(result.newGrid).toEqual(expectedGrid);
     });
 
-    it("should return undefined when game is over", () => {
-      const mockGrid = [
-        [2, 4, 2, 4, 2, 4],
-        [4, 2, 4, 2, 4, 2],
-        [2, 4, 2, 4, 2, 4],
-        [4, 2, 4, 2, 4, 2],
-        [2, 4, 2, 4, 2, 4],
-        [4, 2, 4, 2, 4, 2],
-      ];
-
-      const result = getBoardAfterMove("right", mockGrid, true);
-      expect(result).toBeUndefined();
-    });
-
     it("should handle multiple merges in the same row", () => {
       const mockGrid = [
         [2, 2, 2, 2, 0, 0],

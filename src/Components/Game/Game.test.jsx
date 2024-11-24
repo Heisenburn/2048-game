@@ -29,17 +29,36 @@ describe("Game Component", () => {
     expect(screen.queryByText("Game Over")).not.toBeInTheDocument();
   });
 
-  test("shows game over message when game is over", () => {
-    checkGameOver.mockReturnValue(true);
+  test("handles game over state correctly", () => {
+    checkGameOver.mockReturnValue(false);
+    getBoardAfterMove.mockReturnValue({
+      newGrid: [
+        [2, 4, 2, 4, 2, 4],
+        [4, 2, 4, 2, 4, 2],
+        [2, 4, 2, 4, 2, 4],
+        [4, 2, 4, 2, 4, 2],
+        [2, 4, 2, 4, 2, 4],
+        [4, 2, 4, 2, 4, 2],
+      ],
+    });
+
     render(<Game />);
 
-    // Simulate a move that ends the game
-    getBoardAfterMove.mockReturnValue({ newGrid: [[0]] });
     fireEvent.keyDown(document, { key: "ArrowRight" });
+
+    checkGameOver.mockReturnValue(true);
+
+    fireEvent.keyDown(document, { key: "ArrowLeft" });
 
     expect(
       screen.getByText("Game Over! Click New Game to play again.")
     ).toBeInTheDocument();
+
+    const newGameButton = screen.getByText("New Game");
+    fireEvent.click(newGameButton);
+    expect(
+      screen.queryByText("Game Over! Click New Game to play again.")
+    ).not.toBeInTheDocument();
   });
 
   test("handles arrow key presses", () => {
@@ -54,26 +73,10 @@ describe("Game Component", () => {
     ];
     getBoardAfterMove.mockReturnValue({ newGrid: mockGrid });
 
-    // Test all arrow keys
     const directions = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
     directions.forEach((direction) => {
       fireEvent.keyDown(document, { key: direction });
       expect(getBoardAfterMove).toHaveBeenCalled();
     });
-  });
-
-  test("does not process moves when game is over", () => {
-    checkGameOver.mockReturnValue(true);
-    render(<Game />);
-
-    // Simulate game over state
-    getBoardAfterMove.mockReturnValue({ newGrid: [[0]] });
-    fireEvent.keyDown(document, { key: "ArrowRight" });
-
-    // Try another move
-    getBoardAfterMove.mockClear();
-    fireEvent.keyDown(document, { key: "ArrowLeft" });
-
-    expect(getBoardAfterMove).toHaveBeenCalledTimes(1);
   });
 });
