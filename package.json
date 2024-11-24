@@ -2,7 +2,6 @@
   "name": "my-2048-game",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
