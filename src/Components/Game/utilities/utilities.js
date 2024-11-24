@@ -110,7 +110,8 @@ export const moveUp = (board) => {
           row[columnIndex] = null;
           return;
         }
-        if (rowWithNotEmptyCellAbove + 1 === rowIndex) {
+        const shouldSkipMove = rowWithNotEmptyCellAbove + 1 === rowIndex; //cell cannot merge and cannot move up
+        if (shouldSkipMove) {
           return;
         }
 
@@ -137,7 +138,7 @@ export const moveDown = (board) => {
           clonedBoard,
           columnIndex,
           rowIndex,
-          true // Added parameter to search downwards
+          true
         );
         const allCellsBelowAreEmpty = rowWithNotEmptyCellBelow === null;
         if (allCellsBelowAreEmpty) {
@@ -154,7 +155,8 @@ export const moveDown = (board) => {
           row[columnIndex] = null;
           return;
         }
-        if (rowWithNotEmptyCellBelow - 1 === rowIndex) {
+        const shouldSkipMove = rowWithNotEmptyCellBelow - 1 === rowIndex; //cell cannot merge and cannot move down
+        if (shouldSkipMove) {
           return;
         }
         const indexOfRowAboveCellWithValue = rowWithNotEmptyCellBelow - 1;
