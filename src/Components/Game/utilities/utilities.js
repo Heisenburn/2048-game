@@ -53,6 +53,10 @@ export const getBoardAfterMove = (direction, grid, gameOver) => {
   if (gameOver) return;
 
   let newGrid = grid.map((row) => [...row]);
+  // Track merged cells
+  let mergedCells = Array(GRID_SIZE)
+    .fill()
+    .map(() => Array(GRID_SIZE).fill(false));
 
   const isMovingCellPossible = (fromRow, fromCol, toRow, toCol) => {
     const sourceValue = newGrid[fromRow][fromCol];
@@ -67,10 +71,12 @@ export const getBoardAfterMove = (direction, grid, gameOver) => {
       return true;
     }
 
-    if (targetValue === sourceValue) {
+    // Only merge if target cell hasn't been merged this move
+    if (targetValue === sourceValue && !mergedCells[toRow][toCol]) {
       // Merge identical values
       newGrid[toRow][toCol] = targetValue * 2;
       newGrid[fromRow][fromCol] = 0;
+      mergedCells[toRow][toCol] = true;
       return true;
     }
 

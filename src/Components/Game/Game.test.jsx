@@ -34,7 +34,7 @@ describe("Game Component", () => {
     render(<Game />);
 
     // Simulate a move that ends the game
-    getBoardAfterMove.mockReturnValue({ newGrid: [[0]], moved: true });
+    getBoardAfterMove.mockReturnValue({ newGrid: [[0]] });
     fireEvent.keyDown(document, { key: "ArrowRight" });
 
     expect(
@@ -52,7 +52,7 @@ describe("Game Component", () => {
       [0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0],
     ];
-    getBoardAfterMove.mockReturnValue({ newGrid: mockGrid, moved: true });
+    getBoardAfterMove.mockReturnValue({ newGrid: mockGrid });
 
     // Test all arrow keys
     const directions = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
@@ -67,7 +67,7 @@ describe("Game Component", () => {
     render(<Game />);
 
     // Simulate game over state
-    getBoardAfterMove.mockReturnValue({ newGrid: [[0]], moved: true });
+    getBoardAfterMove.mockReturnValue({ newGrid: [[0]] });
     fireEvent.keyDown(document, { key: "ArrowRight" });
 
     // Try another move

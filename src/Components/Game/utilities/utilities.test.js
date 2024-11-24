@@ -20,6 +20,7 @@ describe("Game Utilities", () => {
 
       const result = addNewTile(mockGrid);
 
+      // No way to test randomness of the new tile, so we just check that 2 tiles were added
       // Count number of non-zero cells
       const nonZeroCells = result.flat().filter((cell) => cell !== 0).length;
       expect(nonZeroCells).toBe(2); // Original tile + new tile
@@ -181,6 +182,98 @@ describe("Game Utilities", () => {
 
       const result = getBoardAfterMove("right", mockGrid, true);
       expect(result).toBeUndefined();
+    });
+
+    it("should handle multiple merges in the same row", () => {
+      const mockGrid = [
+        [2, 2, 2, 2, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const expectedGrid = [
+        [0, 0, 0, 0, 4, 4],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const result = getBoardAfterMove("right", mockGrid, false);
+      expect(result.newGrid).toEqual(expectedGrid);
+    });
+
+    it("should not merge different value tiles", () => {
+      const mockGrid = [
+        [2, 4, 2, 4, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const expectedGrid = [
+        [0, 0, 2, 4, 2, 4],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const result = getBoardAfterMove("right", mockGrid, false);
+      expect(result.newGrid).toEqual(expectedGrid);
+    });
+
+    it("should handle multiple merges in the same column", () => {
+      const mockGrid = [
+        [2, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 0, 0],
+        [2, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const expectedGrid = [
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [4, 0, 0, 0, 0, 0],
+        [4, 0, 0, 0, 0, 0],
+      ];
+
+      const result = getBoardAfterMove("down", mockGrid, false);
+      expect(result.newGrid).toEqual(expectedGrid);
+    });
+
+    it("should only merge once per move", () => {
+      const mockGrid = [
+        [4, 0, 0, 0, 0, 0],
+        [4, 0, 0, 0, 0, 0],
+        [8, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const expectedGrid = [
+        [8, 0, 0, 0, 0, 0],
+        [8, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const result = getBoardAfterMove("up", mockGrid, false);
+      expect(result.newGrid).toEqual(expectedGrid);
     });
   });
 });
