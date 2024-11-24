@@ -255,24 +255,24 @@ describe("Game Utilities", () => {
 
     it("should only merge once per move", () => {
       const mockGrid = [
-        [4, 0, 0, 0, 0, 0],
-        [4, 0, 0, 0, 0, 0],
-        [8, 0, 0, 0, 0, 0],
+        [8, 4, 4, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
       ];
 
       const expectedGrid = [
-        [8, 0, 0, 0, 0, 0],
-        [8, 0, 0, 0, 0, 0],
+        [8, 8, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("up", mockGrid, false);
+      const result = getBoardAfterMove("left", mockGrid, false);
       expect(result.newGrid).toEqual(expectedGrid);
     });
   });

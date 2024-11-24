@@ -71,8 +71,12 @@ export const getBoardAfterMove = (direction, grid, gameOver) => {
       return true;
     }
 
-    // Only merge if target cell hasn't been merged this move
-    if (targetValue === sourceValue && !mergedCells[toRow][toCol]) {
+    // Check if either source or target cell has been merged this move
+    if (
+      targetValue === sourceValue &&
+      !mergedCells[toRow][toCol] &&
+      !mergedCells[fromRow][fromCol]
+    ) {
       // Merge identical values
       newGrid[toRow][toCol] = targetValue * 2;
       newGrid[fromRow][fromCol] = 0;
