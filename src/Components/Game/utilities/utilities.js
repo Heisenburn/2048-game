@@ -1,5 +1,13 @@
 import { GRID_SIZE, INITIAL_CELL_VALUE } from "../constants/constants";
 
+const getCellValue = (row, col, grid) => grid[row][col];
+
+const setCellValue = (row, col, value, grid) => {
+  grid[row][col] = value;
+};
+
+const resetCell = (row, col, grid) => setCellValue(row, col, 0, grid);
+
 const cellHasValue = (row, col, grid) => {
   return grid[row][col] !== 0;
 };
@@ -68,21 +76,22 @@ export const moveIsPossible = (
   grid,
   mergedCells
 ) => {
-  const sourceGridValue = grid[fromRow][fromCol]; // Value of the cell we want to move
-  const targetGridValue = grid[toRow][toCol]; // Value of the destination cell
+  const sourceCellValue = getCellValue(fromRow, fromCol, grid);
+  const destinationCellValue = getCellValue(toRow, toCol, grid);
 
-  if (sourceGridValue === 0) return false; // Can't move an empty cell
+  const isSourceCellEmpty = sourceCellValue === 0;
+  if (isSourceCellEmpty) return false; // Can't move an empty cell
 
-  const targetValueIsEmpty = targetGridValue === 0;
-  if (targetValueIsEmpty) return true;
+  const isTargetCellEmpty = destinationCellValue === 0;
+  if (isTargetCellEmpty) return true;
 
-  const valuesShouldBeMerged = targetGridValue === sourceGridValue;
+  const isMergingPossible = destinationCellValue === sourceCellValue;
 
   // keep track of merged cells to prevent merging the same cells twice
   const areCellsAlreadyMerged =
     mergedCells[toRow][toCol] || mergedCells[fromRow][fromCol];
 
-  return valuesShouldBeMerged && !areCellsAlreadyMerged;
+  return isMergingPossible && !areCellsAlreadyMerged;
 };
 
 export const moveCellTo = (
@@ -93,23 +102,23 @@ export const moveCellTo = (
   grid,
   mergedCells
 ) => {
-  const sourceGridValue = grid[fromRow][fromCol]; // Value of the cell we want to move
-  const targetGridValue = grid[toRow][toCol]; // Value of the destination cell
+  const sourceCellValue = getCellValue(fromRow, fromCol, grid);
+  const destinationCellValue = getCellValue(toRow, toCol, grid);
 
-  const targetValueIsEmpty = targetGridValue === 0;
+  const targetCellIsEmpty = destinationCellValue === 0;
 
-  if (targetValueIsEmpty) {
+  if (targetCellIsEmpty) {
     // Move to empty cell
-    grid[toRow][toCol] = sourceGridValue;
+    setCellValue(toRow, toCol, sourceCellValue, grid);
     //reset source cell
-    grid[fromRow][fromCol] = 0;
+    resetCell(fromRow, fromCol, grid);
     return;
   }
 
   // We can safely assume that the cells have the same value (check moveIsPossible implementation)
-  grid[toRow][toCol] = targetGridValue * 2;
+  setCellValue(toRow, toCol, destinationCellValue * 2, grid);
   //reset source cell
-  grid[fromRow][fromCol] = 0;
+  resetCell(fromRow, fromCol, grid);
   // Mark cells as merged
   mergedCells[toRow][toCol] = true;
 };
