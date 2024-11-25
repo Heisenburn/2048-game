@@ -1,37 +1,46 @@
 import { GRID_SIZE, INITIAL_CELL_VALUE } from "../constants/constants";
 
-export const getBoardAfterAddingRandomTile = (currentGrid) => {
-  // Find all empty cells
+const cellHasValue = (row, col, grid) => {
+  return grid[row][col] !== 0;
+};
+
+const getEmptyCells = (grid) => {
   const emptyCells = [];
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
-      if (currentGrid[row][col] === 0) {
+      if (!cellHasValue(row, col, grid)) {
         emptyCells.push({ row, col });
       }
     }
   }
+  const emptyCellsExist = emptyCells.length > 0;
+  return { emptyCells, emptyCellsExist };
+};
 
-  //TODO: tutaj lepiej skumac
-  // Add new tile if there are empty cells
-  if (emptyCells.length > 0) {
-    const randomCell =
-      emptyCells[Math.floor(Math.random() * emptyCells.length)];
-    currentGrid[randomCell.row][randomCell.col] = INITIAL_CELL_VALUE;
+export const getBoardAfterAddingRandomTile = (currentGrid) => {
+  const { emptyCells, emptyCellsExist } = getEmptyCells(currentGrid);
+
+  if (emptyCellsExist) {
+    // Get random index from available empty cells
+    const randomIndex = Math.floor(Math.random() * emptyCells.length);
+
+    const randomEmptyCellCoordinates = emptyCells[randomIndex];
+
+    const { row: randomRow, col: randomCol } = randomEmptyCellCoordinates;
+
+    currentGrid[randomRow][randomCol] = INITIAL_CELL_VALUE;
   }
   return currentGrid;
 };
 
 export const checkGameOver = (currentGrid) => {
-  // Game is not over if there are empty cells
-  //TODO: to sie powtarza w getBoardAfterAddingRandomTile
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
-      if (currentGrid[row][col] === 0) {
-        return false;
-      }
-    }
+  const { emptyCellsExist } = getEmptyCells(currentGrid);
+
+  if (emptyCellsExist) {
+    return false;
   }
 
+  //TODO: to lepiej skumac
   // Game is not over if there are possible merges
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
@@ -97,16 +106,12 @@ export const moveCellTo = (
     return;
   }
 
-  // We can safely assume that the cells have the same value
+  // We can safely assume that the cells have the same value (check moveIsPossible implementation)
   grid[toRow][toCol] = targetGridValue * 2;
   //reset source cell
   grid[fromRow][fromCol] = 0;
   // Mark cells as merged
   mergedCells[toRow][toCol] = true;
-};
-
-export const cellHasValue = (row, col, grid) => {
-  return grid[row][col] !== 0;
 };
 
 export const getBoardAfterMove = (direction, grid) => {
