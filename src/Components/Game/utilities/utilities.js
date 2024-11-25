@@ -85,13 +85,16 @@ export const moveIsPossible = (
   const isTargetCellEmpty = destinationCellValue === 0;
   if (isTargetCellEmpty) return true;
 
-  const isMergingPossible = destinationCellValue === sourceCellValue;
+  const shouldMerge = destinationCellValue === sourceCellValue;
 
-  // keep track of merged cells to prevent double merge in the same move
-  const mergePresentInThisMove =
-    mergedCells[toRow][toCol] || mergedCells[fromRow][fromCol];
+  // Check if either cell has already been merged this turn
+  const isDestinationCellMerged = mergedCells[toRow][toCol];
+  const isSourceCellMerged = mergedCells[fromRow][fromCol];
 
-  return isMergingPossible && !mergePresentInThisMove;
+  const isMergingPossible =
+    shouldMerge && !isDestinationCellMerged && !isSourceCellMerged;
+
+  return isMergingPossible;
 };
 
 export const moveCellTo = (
