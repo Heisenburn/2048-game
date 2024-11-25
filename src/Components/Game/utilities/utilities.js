@@ -11,6 +11,7 @@ export const getBoardAfterAddingRandomTile = (currentGrid) => {
     }
   }
 
+  //TODO: tutaj lepiej skumac
   // Add new tile if there are empty cells
   if (emptyCells.length > 0) {
     const randomCell =
@@ -22,6 +23,7 @@ export const getBoardAfterAddingRandomTile = (currentGrid) => {
 
 export const checkGameOver = (currentGrid) => {
   // Game is not over if there are empty cells
+  //TODO: to sie powtarza w getBoardAfterAddingRandomTile
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
       if (currentGrid[row][col] === 0) {
@@ -49,7 +51,7 @@ export const checkGameOver = (currentGrid) => {
   return true;
 };
 
-export const checkIfMoveIsPossible = (
+export const moveIsPossible = (
   fromRow,
   fromCol,
   toRow,
@@ -62,15 +64,16 @@ export const checkIfMoveIsPossible = (
 
   if (sourceGridValue === 0) return false; // Can't move an empty cell
 
-  if (targetGridValue === 0) return true; // Can move to an empty cell
+  const targetValueIsEmpty = targetGridValue === 0;
+  if (targetValueIsEmpty) return true;
 
-  const areValuesEqual = targetGridValue === sourceGridValue;
+  const valuesShouldBeMerged = targetGridValue === sourceGridValue;
 
   // keep track of merged cells to prevent merging the same cells twice
   const areCellsAlreadyMerged =
     mergedCells[toRow][toCol] || mergedCells[fromRow][fromCol];
 
-  return areValuesEqual && !areCellsAlreadyMerged;
+  return valuesShouldBeMerged && !areCellsAlreadyMerged;
 };
 
 export const moveCellTo = (
@@ -84,7 +87,9 @@ export const moveCellTo = (
   const sourceGridValue = grid[fromRow][fromCol]; // Value of the cell we want to move
   const targetGridValue = grid[toRow][toCol]; // Value of the destination cell
 
-  if (targetGridValue === 0) {
+  const targetValueIsEmpty = targetGridValue === 0;
+
+  if (targetValueIsEmpty) {
     // Move to empty cell
     grid[toRow][toCol] = sourceGridValue;
     //reset source cell
@@ -92,12 +97,16 @@ export const moveCellTo = (
     return;
   }
 
-  // Merge identical values
+  // We can safely assume that the cells have the same value
   grid[toRow][toCol] = targetGridValue * 2;
   //reset source cell
   grid[fromRow][fromCol] = 0;
   // Mark cells as merged
   mergedCells[toRow][toCol] = true;
+};
+
+export const cellHasValue = (row, col, grid) => {
+  return grid[row][col] !== 0;
 };
 
 export const getBoardAfterMove = (direction, grid) => {
@@ -113,9 +122,9 @@ export const getBoardAfterMove = (direction, grid) => {
         // Start from second row since it is not possible to move the first row up
         for (let row = 1; row < GRID_SIZE; row++) {
           // If we find a non-empty cell
-          if (newGrid[row][col] !== 0) {
+          if (cellHasValue(row, col, newGrid)) {
             let currentRow = row;
-            // Keep moving the cell up while possible and check all rows above the current row
+
             while (currentRow > 0) {
               const movementMetaData = [
                 currentRow,
@@ -126,7 +135,7 @@ export const getBoardAfterMove = (direction, grid) => {
                 mergedCells,
               ];
 
-              if (checkIfMoveIsPossible(...movementMetaData)) {
+              if (moveIsPossible(...movementMetaData)) {
                 moveCellTo(...movementMetaData);
                 currentRow--;
               } else {
@@ -145,9 +154,9 @@ export const getBoardAfterMove = (direction, grid) => {
         // Start from second-to-last row since it is not possible to move the last row down
         for (let row = GRID_SIZE - 2; row >= 0; row--) {
           // If we find a non-empty cell
-          if (newGrid[row][col] !== 0) {
+          if (cellHasValue(row, col, newGrid)) {
             let currentRow = row;
-            // Keep moving the cell down while possible
+
             while (currentRow < GRID_SIZE - 1) {
               const movementMetaData = [
                 currentRow,
@@ -157,7 +166,7 @@ export const getBoardAfterMove = (direction, grid) => {
                 newGrid,
                 mergedCells,
               ];
-              if (checkIfMoveIsPossible(...movementMetaData)) {
+              if (moveIsPossible(...movementMetaData)) {
                 moveCellTo(...movementMetaData);
                 currentRow++;
               } else {
@@ -176,9 +185,9 @@ export const getBoardAfterMove = (direction, grid) => {
         // Start from second column since it is not possible to move the first column left
         for (let col = 1; col < GRID_SIZE; col++) {
           // If we find a non-empty cell
-          if (newGrid[row][col] !== 0) {
+          if (cellHasValue(row, col, newGrid)) {
             let currentCol = col;
-            // Keep moving the cell left while possible
+
             while (currentCol > 0) {
               const movementMetaData = [
                 row,
@@ -188,7 +197,7 @@ export const getBoardAfterMove = (direction, grid) => {
                 newGrid,
                 mergedCells,
               ];
-              if (checkIfMoveIsPossible(...movementMetaData)) {
+              if (moveIsPossible(...movementMetaData)) {
                 moveCellTo(...movementMetaData);
                 currentCol--;
               } else {
@@ -207,9 +216,9 @@ export const getBoardAfterMove = (direction, grid) => {
         // Start from second-to-last column since it is not possible to move the last column right
         for (let col = GRID_SIZE - 2; col >= 0; col--) {
           // If we find a non-empty cell
-          if (newGrid[row][col] !== 0) {
+          if (cellHasValue(row, col, newGrid)) {
             let currentCol = col;
-            // Keep moving the cell right while possible
+
             while (currentCol < GRID_SIZE - 1) {
               const movementMetaData = [
                 row,
@@ -219,7 +228,7 @@ export const getBoardAfterMove = (direction, grid) => {
                 newGrid,
                 mergedCells,
               ];
-              if (checkIfMoveIsPossible(...movementMetaData)) {
+              if (moveIsPossible(...movementMetaData)) {
                 moveCellTo(...movementMetaData);
                 currentCol++;
               } else {
