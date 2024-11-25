@@ -48,16 +48,23 @@ export const checkGameOver = (currentGrid) => {
     return false;
   }
 
-  //TODO: to lepiej skumac
   // Game is not over if there are possible merges
   for (let row = 0; row < GRID_SIZE; row++) {
     for (let col = 0; col < GRID_SIZE; col++) {
-      const hasDownwardMerge =
-        row < GRID_SIZE - 1 &&
-        currentGrid[row][col] === currentGrid[row + 1][col];
-      const hasRightwardMerge =
-        col < GRID_SIZE - 1 &&
-        currentGrid[row][col] === currentGrid[row][col + 1];
+      const isNotLastRow = row < GRID_SIZE - 1;
+      const isNotLastCol = col < GRID_SIZE - 1;
+      const currentValue = currentGrid[row][col];
+
+      const valueBelow = currentGrid[row + 1][col];
+      const valueRight = currentGrid[row][col + 1];
+
+      const hasMatchingValueBelow = currentValue === valueBelow;
+      const hasMatchingValueRight = currentValue === valueRight;
+
+      // Only need to check one direction for horizontal and vertical
+      // since checking both cells would mean checking the same cell twice
+      const hasDownwardMerge = isNotLastRow && hasMatchingValueBelow;
+      const hasRightwardMerge = isNotLastCol && hasMatchingValueRight;
 
       if (hasDownwardMerge || hasRightwardMerge) {
         return false;
