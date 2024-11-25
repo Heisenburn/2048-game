@@ -87,11 +87,11 @@ export const moveIsPossible = (
 
   const isMergingPossible = destinationCellValue === sourceCellValue;
 
-  // keep track of merged cells to prevent merging the same cells twice
-  const areCellsAlreadyMerged =
+  // keep track of merged cells to prevent double merge in the same move
+  const mergePresentInThisMove =
     mergedCells[toRow][toCol] || mergedCells[fromRow][fromCol];
 
-  return isMergingPossible && !areCellsAlreadyMerged;
+  return isMergingPossible && !mergePresentInThisMove;
 };
 
 export const moveCellTo = (
@@ -125,6 +125,13 @@ export const moveCellTo = (
 
 export const getBoardAfterMove = (direction, grid) => {
   let newGrid = grid.map((row) => [...row]);
+
+  //TODO: mergedCells jest per ruch i sie resetuje
+  // [
+  //   [false, false, false, false, false, true],
+  //   [false, false, false, false, false, false],
+  //   (...)
+  // ];
   let mergedCells = Array(GRID_SIZE)
     .fill()
     .map(() => Array(GRID_SIZE).fill(false));
