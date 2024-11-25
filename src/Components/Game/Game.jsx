@@ -9,8 +9,8 @@ import {
   NewGameButton,
 } from "./Game.styles";
 import {
-  addNewTile,
   checkGameOver,
+  getBoardAfterAddingRandomTile,
   getBoardAfterMove,
 } from "./utilities/utilities";
 
@@ -18,18 +18,9 @@ const generateInitialBoard = () => {
   const newGrid = Array(GRID_SIZE)
     .fill()
     .map(() => Array(GRID_SIZE).fill(0));
-  addNewTile(newGrid);
+  getBoardAfterAddingRandomTile(newGrid);
   return newGrid;
 };
-
-// [
-//   [0, 0, 0, 0, 0, 2 (random)],
-//   [0, 0, 0, 0, 0, 0],
-//   [0, 0, 0, 0, 0, 0],
-//   [0, 0, 0, 0, 0, 0],
-//   [0, 0, 0, 0, 0, 0],
-//   [0, 0, 0, 0, 0, 0],
-// ];
 
 const INITIAL_GRID = generateInitialBoard();
 
@@ -58,11 +49,12 @@ const Game = () => {
       //prevent non-arrow key presses
       if (moveDirection) {
         const { newGrid } = getBoardAfterMove(moveDirection, grid);
-        const updatedGrid = addNewTile(newGrid);
+        const updatedGrid = getBoardAfterAddingRandomTile(newGrid);
 
         if (checkGameOver(updatedGrid)) {
           return setGameOver(true);
         }
+
         setGrid(updatedGrid);
       }
     };
@@ -81,9 +73,7 @@ const Game = () => {
         <Grid grid={grid} />
       </GameBoard>
 
-      {gameOver && (
-        <GameOver>Game Over! Click New Game to play again.</GameOver>
-      )}
+      {gameOver && <GameOver>Game Over! Click new game to continue.</GameOver>}
     </Container>
   );
 };

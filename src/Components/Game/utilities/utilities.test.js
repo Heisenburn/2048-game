@@ -1,4 +1,8 @@
-import { addNewTile, checkGameOver, getBoardAfterMove } from "./utilities";
+import {
+  checkGameOver,
+  getBoardAfterAddingRandomTile,
+  getBoardAfterMove,
+} from "./utilities";
 
 // Mock constants
 jest.mock("../constants/constants", () => ({
@@ -7,7 +11,7 @@ jest.mock("../constants/constants", () => ({
 }));
 
 describe("Game Utilities", () => {
-  describe("addNewTile", () => {
+  describe("getBoardAfterAddingRandomTile", () => {
     it("should add a new tile to an empty cell", () => {
       const mockGrid = [
         [2, 0, 0, 0, 0, 0],
@@ -18,7 +22,7 @@ describe("Game Utilities", () => {
         [0, 0, 0, 0, 0, 0],
       ];
 
-      const result = addNewTile(mockGrid);
+      const result = getBoardAfterAddingRandomTile(mockGrid);
 
       // No way to test randomness of the new tile, so we just check that 2 tiles were added
       // Count number of non-zero cells
@@ -30,7 +34,7 @@ describe("Game Utilities", () => {
       const fullGrid = Array(6)
         .fill()
         .map(() => Array(6).fill(2));
-      const result = addNewTile(fullGrid);
+      const result = getBoardAfterAddingRandomTile(fullGrid);
 
       expect(result).toEqual(fullGrid);
     });

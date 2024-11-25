@@ -7,7 +7,7 @@ import { checkGameOver, getBoardAfterMove } from "./utilities/utilities";
 jest.mock("./utilities/utilities", () => ({
   getBoardAfterMove: jest.fn(),
   checkGameOver: jest.fn(),
-  addNewTile: jest.fn((grid) => grid),
+  getBoardAfterAddingRandomTile: jest.fn((grid) => grid),
 }));
 
 describe("Game Component", () => {
@@ -51,13 +51,13 @@ describe("Game Component", () => {
     fireEvent.keyDown(document, { key: "ArrowLeft" });
 
     expect(
-      screen.getByText("Game Over! Click New Game to play again.")
+      screen.getByText("Game Over! Click new game to continue.")
     ).toBeInTheDocument();
 
     const newGameButton = screen.getByText("New Game");
     fireEvent.click(newGameButton);
     expect(
-      screen.queryByText("Game Over! Click New Game to play again.")
+      screen.queryByText("Game Over! Click new game to continue.")
     ).not.toBeInTheDocument();
   });
 
