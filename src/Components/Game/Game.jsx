@@ -22,6 +22,15 @@ const generateInitialBoard = () => {
   return newGrid;
 };
 
+// [
+//   [0, 0, 0, 0, 0, 2 (random)],
+//   [0, 0, 0, 0, 0, 0],
+//   [0, 0, 0, 0, 0, 0],
+//   [0, 0, 0, 0, 0, 0],
+//   [0, 0, 0, 0, 0, 0],
+//   [0, 0, 0, 0, 0, 0],
+// ];
+
 const INITIAL_GRID = generateInitialBoard();
 
 const Game = () => {
@@ -46,14 +55,15 @@ const Game = () => {
 
       const moveDirection = directions[event.key];
 
+      //prevent non-arrow key presses
       if (moveDirection) {
         const { newGrid } = getBoardAfterMove(moveDirection, grid);
         const updatedGrid = addNewTile(newGrid);
-        setGrid(updatedGrid);
 
         if (checkGameOver(updatedGrid)) {
-          setGameOver(true);
+          return setGameOver(true);
         }
+        setGrid(updatedGrid);
       }
     };
 
