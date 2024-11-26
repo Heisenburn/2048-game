@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { GRID_SIZE } from "../Game/constants";
+import { GRID_SIZE } from "../../constants";
 
 export const GridContainer = styled.div`
   display: grid;

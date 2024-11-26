@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { CELL_COLORS } from "../Game/constants";
+import { CELL_COLORS } from "../../constants";
 
 const getCellColor = (number) => {
   const fallbackColor = "#854d0e";

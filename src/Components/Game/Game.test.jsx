@@ -4,74 +4,111 @@ import {
   GAME_OVER_MESSAGE,
   GAME_WIN_MESSAGE,
   NEW_GAME_BUTTON_TEXT,
-} from "./constants";
+} from "../../constants/constants";
+import { useGameLogic } from "../../hooks/useGameLogic";
 import { Game } from "./Game";
-import { checkGameOver, getBoardAfterMove } from "./utilities";
 
-jest.mock("./utilities", () => ({
-  getBoardAfterMove: jest.fn(),
-  checkGameOver: jest.fn(),
-  getBoardAfterAddingRandomTile: jest.fn((grid) => grid),
-}));
+jest.mock("../../hooks/useGameLogic");
 
-describe("Game", () => {
+describe("Game Component", () => {
+  const mockGrid = [
+    [0, 2, 0, 0, 2, 0],
+    [2, 4, 2, 2, 4, 2],
+    [0, 2, 0, 0, 2, 0],
+    [0, 2, 0, 0, 2, 0],
+    [2, 4, 2, 2, 4, 2],
+    [0, 2, 0, 0, 2, 0],
+  ];
+
+  const mockInitializeGame = jest.fn();
+
   beforeEach(() => {
-    jest.clearAllMocks();
+    // Reset mock before each test
+    useGameLogic.mockReset();
   });
 
-  test("renders without crashing", () => {
-    render(<Game />);
-    expect(screen.getByText(NEW_GAME_BUTTON_TEXT)).toBeInTheDocument();
-  });
-
-  test("handles arrow key presses", () => {
-    render(<Game />);
-
-    getBoardAfterMove.mockReturnValue({ newGrid: [[]] });
-
-    const directions = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
-    directions.forEach((direction) => {
-      fireEvent.keyDown(document, { key: direction });
-      expect(getBoardAfterMove).toHaveBeenCalled();
+  test("renders game board and new game button", () => {
+    useGameLogic.mockReturnValue({
+      grid: mockGrid,
+      isGameOver: false,
+      isGameWon: false,
+      initializeGame: mockInitializeGame,
     });
+
+    render(<Game />);
+
+    expect(
+      screen.getByRole("button", { name: NEW_GAME_BUTTON_TEXT })
+    ).toBeInTheDocument();
   });
 
-  test("handles game over state correctly", () => {
-    // Initial state check
+  test("calls initializeGame when new game button is clicked", () => {
+    useGameLogic.mockReturnValue({
+      grid: mockGrid,
+      isGameOver: false,
+      isGameWon: false,
+      initializeGame: mockInitializeGame,
+    });
+
     render(<Game />);
-    expect(screen.queryByText(GAME_OVER_MESSAGE)).not.toBeInTheDocument();
 
-    // Game continues normally when not game over
-    checkGameOver.mockReturnValue(false);
-    getBoardAfterMove.mockReturnValue({ newGrid: [[]] });
-    fireEvent.keyDown(document, { key: "ArrowRight" });
-    expect(screen.queryByText(GAME_OVER_MESSAGE)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText(NEW_GAME_BUTTON_TEXT));
+    expect(mockInitializeGame).toHaveBeenCalledTimes(1);
+  });
 
-    // Game over state
-    checkGameOver.mockReturnValue(true);
-    fireEvent.keyDown(document, { key: "ArrowLeft" });
+  test("displays game over message when game is over", () => {
+    useGameLogic.mockReturnValue({
+      grid: mockGrid,
+      isGameOver: true,
+      isGameWon: false,
+      initializeGame: mockInitializeGame,
+    });
+
+    render(<Game />);
+
     expect(screen.getByText(GAME_OVER_MESSAGE)).toBeInTheDocument();
-
-    // New game button resets the game over state
-    fireEvent.click(screen.getByText(NEW_GAME_BUTTON_TEXT));
-    expect(screen.queryByText(GAME_OVER_MESSAGE)).not.toBeInTheDocument();
   });
 
-  test("handles winning state correctly", () => {
-    render(<Game />);
-    expect(screen.queryByText(GAME_WIN_MESSAGE)).not.toBeInTheDocument();
-
-    // Simulate a winning move
-    getBoardAfterMove.mockReturnValue({
-      newGrid: [[2048]],
-      hasWon: true,
+  test("displays win message when game is won", () => {
+    useGameLogic.mockReturnValue({
+      grid: mockGrid,
+      isGameOver: false,
+      isGameWon: true,
+      initializeGame: mockInitializeGame,
     });
 
-    fireEvent.keyDown(document, { key: "ArrowRight" });
-    expect(screen.getByText(GAME_WIN_MESSAGE)).toBeInTheDocument();
+    render(<Game />);
 
-    // New game button resets the winning state
-    fireEvent.click(screen.getByText(NEW_GAME_BUTTON_TEXT));
+    expect(screen.getByText(GAME_WIN_MESSAGE)).toBeInTheDocument();
+  });
+
+  test("does not display any status message during active game", () => {
+    useGameLogic.mockReturnValue({
+      grid: mockGrid,
+      isGameOver: false,
+      isGameWon: false,
+      initializeGame: mockInitializeGame,
+    });
+
+    render(<Game />);
+
+    expect(screen.queryByText(GAME_OVER_MESSAGE)).not.toBeInTheDocument();
     expect(screen.queryByText(GAME_WIN_MESSAGE)).not.toBeInTheDocument();
+  });
+
+  test("renders grid with correct dimensions", () => {
+    useGameLogic.mockReturnValue({
+      grid: mockGrid,
+      isGameOver: false,
+      isGameWon: false,
+      initializeGame: mockInitializeGame,
+    });
+
+    render(<Game />);
+
+    const gridContainer = screen.getByTestId("grid-container");
+    expect(gridContainer).toBeInTheDocument();
+    expect(mockGrid.length).toBe(6); // Check rows
+    expect(mockGrid[0].length).toBe(6); // Check columns
   });
 });

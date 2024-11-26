@@ -1,4 +1,4 @@
-import { INITIAL_CELL_VALUE } from "../constants/constants";
+import { INITIAL_CELL_VALUE, GRID_SIZE } from "../constants/constants";
 import { getEmptyCells } from "./cell";
 
 export const getBoardAfterAddingRandomTile = (currentGrid) => {
@@ -16,4 +16,12 @@ export const getBoardAfterAddingRandomTile = (currentGrid) => {
     currentGrid[randomRow][randomCol] = INITIAL_CELL_VALUE;
   }
   return currentGrid;
+};
+
+export const generateInitialBoard = () => {
+  const newGrid = Array(GRID_SIZE)
+    .fill()
+    .map(() => Array(GRID_SIZE).fill(0));
+  getBoardAfterAddingRandomTile(newGrid);
+  return newGrid;
 };

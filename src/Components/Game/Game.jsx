@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Grid } from "../Grid";
+import React from "react";
 import {
-  DIRECTIONS,
   GAME_OVER_MESSAGE,
   GAME_WIN_MESSAGE,
-  GRID_SIZE,
   NEW_GAME_BUTTON_TEXT,
-  WINNING_CELL_VALUE,
-} from "./constants";
+} from "../../constants/constants";
+import { useGameLogic } from "../../hooks/useGameLogic";
+import { generateInitialBoard } from "../../utilities/board";
+import { Grid } from "../Grid";
 import {
   Container,
   GameBoard,
@@ -15,63 +14,12 @@ import {
   Header,
   NewGameButton,
 } from "./Game.styles";
-import {
-  checkGameOver,
-  getBoardAfterAddingRandomTile,
-  getBoardAfterMove,
-} from "./utilities";
-
-const generateInitialBoard = () => {
-  const newGrid = Array(GRID_SIZE)
-    .fill()
-    .map(() => Array(GRID_SIZE).fill(0));
-  getBoardAfterAddingRandomTile(newGrid);
-  return newGrid;
-};
 
 const INITIAL_GRID = generateInitialBoard();
 
 export const Game = () => {
-  const [grid, setGrid] = useState(INITIAL_GRID);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [isGameWon, setIsGameWon] = useState(false);
-
-  const initializeGame = () => {
-    setGrid(generateInitialBoard());
-    setIsGameOver(false);
-    setIsGameWon(false);
-  };
-
-  useEffect(() => {
-    if (isGameOver || isGameWon) return;
-
-    const handleKeyPress = async (event) => {
-      const moveDirection = DIRECTIONS[event.key];
-
-      //prevent non-arrow key presses
-      if (!moveDirection) return;
-
-      const { newGrid } = getBoardAfterMove(moveDirection, grid);
-
-      const isWinningCellPresent = newGrid.some((row) =>
-        row.some((cell) => cell === WINNING_CELL_VALUE)
-      );
-      if (isWinningCellPresent) {
-        setGrid(newGrid);
-        return setIsGameWon(true);
-      }
-
-      const updatedGrid = getBoardAfterAddingRandomTile(newGrid);
-      if (checkGameOver(updatedGrid)) {
-        return setIsGameOver(true);
-      }
-
-      setGrid(updatedGrid);
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [grid, isGameOver, isGameWon]);
+  const { grid, isGameOver, isGameWon, initializeGame } =
+    useGameLogic(INITIAL_GRID);
 
   return (
     <Container>
