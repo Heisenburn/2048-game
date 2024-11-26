@@ -7,6 +7,24 @@ import {
   getBoardAfterMove,
 } from "../utilities";
 
+const checkWinningCondition = (board) => {
+  return board.some((row) => row.some((cell) => cell === WINNING_CELL_VALUE));
+};
+
+const processWinningMove = (newGrid, setGrid, setIsGameWon) => {
+  setGrid(newGrid);
+  setIsGameWon(true);
+};
+
+const processRegularMove = (newGrid, setGrid, setIsGameOver) => {
+  const updatedGrid = getBoardAfterAddingRandomTile(newGrid);
+  if (checkGameOver(updatedGrid)) {
+    setIsGameOver(true);
+    return;
+  }
+  setGrid(updatedGrid);
+};
+
 export const useGameLogic = (initialGrid) => {
   const [grid, setGrid] = useState(initialGrid);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -17,25 +35,18 @@ export const useGameLogic = (initialGrid) => {
       if (isGameOver || isGameWon) return;
 
       const moveDirection = DIRECTIONS[event.key];
+
+      //ignore not arrow key presses
       if (!moveDirection) return;
 
       const { newGrid } = getBoardAfterMove(moveDirection, grid);
 
-      const isWinningCellPresent = newGrid.some((row) =>
-        row.some((cell) => cell === WINNING_CELL_VALUE)
-      );
-
-      if (isWinningCellPresent) {
-        setGrid(newGrid);
-        return setIsGameWon(true);
+      if (checkWinningCondition(newGrid)) {
+        processWinningMove(newGrid, setGrid, setIsGameWon);
+        return;
       }
 
-      const updatedGrid = getBoardAfterAddingRandomTile(newGrid);
-      if (checkGameOver(updatedGrid)) {
-        return setIsGameOver(true);
-      }
-
-      setGrid(updatedGrid);
+      processRegularMove(newGrid, setGrid, setIsGameOver);
     },
     [grid, isGameOver, isGameWon]
   );
