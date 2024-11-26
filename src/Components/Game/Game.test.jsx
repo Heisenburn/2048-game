@@ -1,5 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
+import {
+  GAME_OVER_MESSAGE,
+  GAME_WIN_MESSAGE,
+  NEW_GAME_BUTTON_TEXT,
+} from "./constants";
 import Game from "./Game";
 import { checkGameOver, getBoardAfterMove } from "./utilities";
 
@@ -16,7 +21,7 @@ describe("Game", () => {
 
   test("renders without crashing", () => {
     render(<Game />);
-    expect(screen.getByText("New Game")).toBeInTheDocument();
+    expect(screen.getByText(NEW_GAME_BUTTON_TEXT)).toBeInTheDocument();
   });
 
   test("handles arrow key presses", () => {
@@ -32,25 +37,41 @@ describe("Game", () => {
   });
 
   test("handles game over state correctly", () => {
-    const gameOverMsg = "Game Over! Click new game to continue.";
-
     // Initial state check
     render(<Game />);
-    expect(screen.queryByText(gameOverMsg)).not.toBeInTheDocument();
+    expect(screen.queryByText(GAME_OVER_MESSAGE)).not.toBeInTheDocument();
 
     // Game continues normally when not game over
     checkGameOver.mockReturnValue(false);
     getBoardAfterMove.mockReturnValue({ newGrid: [[]] });
     fireEvent.keyDown(document, { key: "ArrowRight" });
-    expect(screen.queryByText(gameOverMsg)).not.toBeInTheDocument();
+    expect(screen.queryByText(GAME_OVER_MESSAGE)).not.toBeInTheDocument();
 
     // Game over state
     checkGameOver.mockReturnValue(true);
     fireEvent.keyDown(document, { key: "ArrowLeft" });
-    expect(screen.getByText(gameOverMsg)).toBeInTheDocument();
+    expect(screen.getByText(GAME_OVER_MESSAGE)).toBeInTheDocument();
 
     // New game button resets the game over state
-    fireEvent.click(screen.getByText("New Game"));
-    expect(screen.queryByText(gameOverMsg)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText(NEW_GAME_BUTTON_TEXT));
+    expect(screen.queryByText(GAME_OVER_MESSAGE)).not.toBeInTheDocument();
+  });
+
+  test("handles winning state correctly", () => {
+    render(<Game />);
+    expect(screen.queryByText(GAME_WIN_MESSAGE)).not.toBeInTheDocument();
+
+    // Simulate a winning move
+    getBoardAfterMove.mockReturnValue({
+      newGrid: [[2048]],
+      hasWon: true,
+    });
+
+    fireEvent.keyDown(document, { key: "ArrowRight" });
+    expect(screen.getByText(GAME_WIN_MESSAGE)).toBeInTheDocument();
+
+    // New game button resets the winning state
+    fireEvent.click(screen.getByText(NEW_GAME_BUTTON_TEXT));
+    expect(screen.queryByText(GAME_WIN_MESSAGE)).not.toBeInTheDocument();
   });
 });

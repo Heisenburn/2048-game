@@ -40,7 +40,7 @@ export const GameBoard = styled.div`
   border-radius: 0.5rem;
 `;
 
-export const GameOver = styled.div`
+export const GameStatus = styled.div`
   margin-top: 1rem;
   font-size: 1.25rem;
   font-weight: bold;
