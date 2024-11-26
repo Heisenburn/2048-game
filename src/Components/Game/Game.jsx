@@ -49,26 +49,24 @@ export const Game = () => {
       const moveDirection = DIRECTIONS[event.key];
 
       //prevent non-arrow key presses
-      if (moveDirection) {
-        const { newGrid } = getBoardAfterMove(moveDirection, grid);
+      if (!moveDirection) return;
 
-        const isWinningCellPresent = newGrid.some((row) =>
-          row.some((cell) => cell === WINNING_CELL_VALUE)
-        );
+      const { newGrid } = getBoardAfterMove(moveDirection, grid);
 
-        if (isWinningCellPresent) {
-          setGrid(newGrid);
-          return setIsGameWon(true);
-        }
-
-        const updatedGrid = getBoardAfterAddingRandomTile(newGrid);
-
-        if (checkGameOver(updatedGrid)) {
-          return setIsGameOver(true);
-        }
-
-        setGrid(updatedGrid);
+      const isWinningCellPresent = newGrid.some((row) =>
+        row.some((cell) => cell === WINNING_CELL_VALUE)
+      );
+      if (isWinningCellPresent) {
+        setGrid(newGrid);
+        return setIsGameWon(true);
       }
+
+      const updatedGrid = getBoardAfterAddingRandomTile(newGrid);
+      if (checkGameOver(updatedGrid)) {
+        return setIsGameOver(true);
+      }
+
+      setGrid(updatedGrid);
     };
 
     window.addEventListener("keydown", handleKeyPress);

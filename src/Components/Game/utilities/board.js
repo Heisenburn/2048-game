@@ -3,6 +3,7 @@ import { getEmptyCells } from "./cell";
 
 export const getBoardAfterAddingRandomTile = (currentGrid) => {
   const { emptyCells, emptyCellsExist } = getEmptyCells(currentGrid);
+  //emptyCells structure: [[row, col], [row, col], [row, col]]
 
   if (emptyCellsExist) {
     // Get random index from available empty cells
