@@ -31,7 +31,7 @@ const generateInitialBoard = () => {
 
 const INITIAL_GRID = generateInitialBoard();
 
-const Game = () => {
+export const Game = () => {
   const [grid, setGrid] = useState(INITIAL_GRID);
   const [isGameOver, setIsGameOver] = useState(false);
   const [isGameWon, setIsGameWon] = useState(false);
@@ -95,5 +95,3 @@ const Game = () => {
     </Container>
   );
 };
-
-export default Game;

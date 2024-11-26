@@ -6,15 +6,15 @@ const getCellColor = (number) => {
   return CELL_COLORS[number] || fallbackColor;
 };
 export const CellContainer = styled.div`
-  width: 6rem;
-  height: 6rem;
+  width: 5rem;
+  height: 5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.25rem;
   font-weight: bold;
-  background-color: ${(props) => getCellColor(props.value)};
-  color: ${(props) => (props.value >= 64 ? "white" : "#1f2937")};
+  background-color: ${({ value }) => getCellColor(value)};
+  color: ${({ value }) => (value >= 512 ? "white" : "#1f2937")};
   border-radius: 0.5rem;
   transition: background-color 0.1s;
 `;

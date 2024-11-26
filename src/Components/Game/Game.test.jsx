@@ -5,7 +5,7 @@ import {
   GAME_WIN_MESSAGE,
   NEW_GAME_BUTTON_TEXT,
 } from "./constants";
-import Game from "./Game";
+import { Game } from "./Game";
 import { checkGameOver, getBoardAfterMove } from "./utilities";
 
 jest.mock("./utilities", () => ({
