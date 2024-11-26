@@ -12,7 +12,7 @@ import {
   checkGameOver,
   getBoardAfterAddingRandomTile,
   getBoardAfterMove,
-} from "./utilities/utilities";
+} from "./utilities";
 
 const generateInitialBoard = () => {
   const newGrid = Array(GRID_SIZE)

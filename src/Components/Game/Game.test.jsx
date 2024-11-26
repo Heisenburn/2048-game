@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import React from "react";
 import Game from "./Game";
-import { checkGameOver, getBoardAfterMove } from "./utilities/utilities";
+import { checkGameOver, getBoardAfterMove } from "./utilities";
 
-jest.mock("./utilities/utilities", () => ({
+jest.mock("./utilities", () => ({
   getBoardAfterMove: jest.fn(),
   checkGameOver: jest.fn(),
   getBoardAfterAddingRandomTile: jest.fn((grid) => grid),

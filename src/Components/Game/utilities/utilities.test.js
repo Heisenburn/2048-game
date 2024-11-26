@@ -1,14 +1,6 @@
-import {
-  checkGameOver,
-  getBoardAfterAddingRandomTile,
-  getBoardAfterMove,
-} from "./utilities";
-
-// Mock constants
-jest.mock("../constants/constants", () => ({
-  GRID_SIZE: 6,
-  INITIAL_CELL_VALUE: 2,
-}));
+import { getBoardAfterAddingRandomTile } from "./board";
+import { checkGameOver } from "./gameState";
+import { getBoardAfterMove } from "./movement";
 
 describe("Game Utilities", () => {
   describe("getBoardAfterAddingRandomTile", () => {
@@ -68,7 +60,7 @@ describe("Game Utilities", () => {
     });
 
     it("should return true when no moves are possible", () => {
-      const mockGrid = [
+      const gameOverGrid = [
         [2, 4, 2, 4, 2, 4],
         [4, 2, 4, 2, 4, 2],
         [2, 4, 2, 4, 2, 4],
@@ -77,7 +69,7 @@ describe("Game Utilities", () => {
         [4, 2, 4, 2, 4, 2],
       ];
 
-      expect(checkGameOver(mockGrid)).toBe(true);
+      expect(checkGameOver(gameOverGrid)).toBe(true);
     });
   });
 
@@ -101,7 +93,7 @@ describe("Game Utilities", () => {
         [0, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("up", mockGrid, false);
+      const result = getBoardAfterMove("up", mockGrid);
       expect(result.newGrid).toEqual(expectedGrid);
     });
 
@@ -124,7 +116,7 @@ describe("Game Utilities", () => {
         [4, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("down", mockGrid, false);
+      const result = getBoardAfterMove("down", mockGrid);
       expect(result.newGrid).toEqual(expectedGrid);
     });
 
@@ -147,7 +139,7 @@ describe("Game Utilities", () => {
         [0, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("left", mockGrid, false);
+      const result = getBoardAfterMove("left", mockGrid);
       expect(result.newGrid).toEqual(expectedGrid);
     });
 
@@ -170,7 +162,7 @@ describe("Game Utilities", () => {
         [0, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("right", mockGrid, false);
+      const result = getBoardAfterMove("right", mockGrid);
       expect(result.newGrid).toEqual(expectedGrid);
     });
 
@@ -193,30 +185,7 @@ describe("Game Utilities", () => {
         [0, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("right", mockGrid, false);
-      expect(result.newGrid).toEqual(expectedGrid);
-    });
-
-    it("should not merge different value tiles", () => {
-      const mockGrid = [
-        [2, 4, 2, 4, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-      ];
-
-      const expectedGrid = [
-        [0, 0, 2, 4, 2, 4],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0],
-      ];
-
-      const result = getBoardAfterMove("right", mockGrid, false);
+      const result = getBoardAfterMove("right", mockGrid);
       expect(result.newGrid).toEqual(expectedGrid);
     });
 
@@ -239,11 +208,34 @@ describe("Game Utilities", () => {
         [4, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("down", mockGrid, false);
+      const result = getBoardAfterMove("down", mockGrid);
       expect(result.newGrid).toEqual(expectedGrid);
     });
 
-    it("should only merge once per move", () => {
+    it("should not merge different value tiles", () => {
+      const mockGrid = [
+        [2, 4, 2, 4, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const expectedGrid = [
+        [0, 0, 2, 4, 2, 4],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const result = getBoardAfterMove("right", mockGrid);
+      expect(result.newGrid).toEqual(expectedGrid);
+    });
+
+    it("should only merge once per move and not merge the resulting tile again", () => {
       const mockGrid = [
         [8, 4, 4, 0, 0, 0],
         [0, 0, 0, 0, 0, 0],
@@ -262,7 +254,7 @@ describe("Game Utilities", () => {
         [0, 0, 0, 0, 0, 0],
       ];
 
-      const result = getBoardAfterMove("left", mockGrid, false);
+      const result = getBoardAfterMove("left", mockGrid);
       expect(result.newGrid).toEqual(expectedGrid);
     });
   });

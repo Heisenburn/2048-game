@@ -1,47 +1,7 @@
-import { GRID_SIZE, INITIAL_CELL_VALUE } from "../constants/constants";
+import { GRID_SIZE } from "../constants/constants";
+import { cellHasValue, getCellValue, resetCell, setCellValue } from "./cell";
 
-const getCellValue = (row, col, grid) => grid[row][col];
-
-const setCellValue = (row, col, value, grid) => {
-  grid[row][col] = value;
-};
-
-const resetCell = (row, col, grid) => setCellValue(row, col, 0, grid);
-
-const cellHasValue = (row, col, grid) => {
-  return grid[row][col] !== 0;
-};
-
-const getEmptyCells = (grid) => {
-  const emptyCells = [];
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
-      if (!cellHasValue(row, col, grid)) {
-        emptyCells.push({ row, col });
-      }
-    }
-  }
-  const emptyCellsExist = emptyCells.length > 0;
-  return { emptyCells, emptyCellsExist };
-};
-
-export const getBoardAfterAddingRandomTile = (currentGrid) => {
-  const { emptyCells, emptyCellsExist } = getEmptyCells(currentGrid);
-
-  if (emptyCellsExist) {
-    // Get random index from available empty cells
-    const randomIndex = Math.floor(Math.random() * emptyCells.length);
-
-    const randomEmptyCellCoordinates = emptyCells[randomIndex];
-
-    const { row: randomRow, col: randomCol } = randomEmptyCellCoordinates;
-
-    currentGrid[randomRow][randomCol] = INITIAL_CELL_VALUE;
-  }
-  return currentGrid;
-};
-
-const canMergeCells = (
+export const canMergeCells = (
   sourceCellValue,
   destinationCellValue,
   mergedCells = null,
@@ -90,37 +50,6 @@ export const moveIsPossible = (
     toRow,
     toCol
   );
-};
-
-export const checkGameOver = (currentGrid) => {
-  const { emptyCellsExist } = getEmptyCells(currentGrid);
-
-  if (emptyCellsExist) {
-    return false;
-  }
-
-  // Game is not over if there are possible merges
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
-      const isNotLastRow = row < GRID_SIZE - 1;
-      const isNotLastCol = col < GRID_SIZE - 1;
-      const currentValue = currentGrid[row][col];
-
-      // Only need to check one direction for horizontal and vertical
-      // since checking both cells would mean checking the same cell twice
-      if (isNotLastRow) {
-        const valueBelow = currentGrid[row + 1][col];
-        if (canMergeCells(currentValue, valueBelow)) return false;
-      }
-
-      if (isNotLastCol) {
-        const valueRight = currentGrid[row][col + 1];
-        if (canMergeCells(currentValue, valueRight)) return false;
-      }
-    }
-  }
-
-  return true;
 };
 
 export const moveCellTo = (
