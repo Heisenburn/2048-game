@@ -13,7 +13,7 @@ export const useGameLogic = (initialGrid) => {
   const [isGameWon, setIsGameWon] = useState(false);
 
   const handleKeyPress = useCallback(
-    async (event) => {
+    (event) => {
       if (isGameOver || isGameWon) return;
 
       const moveDirection = DIRECTIONS[event.key];
