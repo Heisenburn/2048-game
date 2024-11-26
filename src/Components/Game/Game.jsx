@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Grid } from "../Grid";
 import {
+  DIRECTIONS,
   GAME_OVER_MESSAGE,
   GAME_WIN_MESSAGE,
   GRID_SIZE,
@@ -45,14 +46,7 @@ const Game = () => {
     if (isGameOver || isGameWon) return;
 
     const handleKeyPress = async (event) => {
-      const directions = {
-        ArrowUp: "up",
-        ArrowDown: "down",
-        ArrowLeft: "left",
-        ArrowRight: "right",
-      };
-
-      const moveDirection = directions[event.key];
+      const moveDirection = DIRECTIONS[event.key];
 
       //prevent non-arrow key presses
       if (moveDirection) {

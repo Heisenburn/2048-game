@@ -83,13 +83,6 @@ export const moveCellTo = (
 
 export const getBoardAfterMove = (direction, grid) => {
   let newGrid = grid.map((row) => [...row]);
-
-  //TODO: mergedCells jest per ruch i sie resetuje
-  // [
-  //   [false, false, false, false, false, true],
-  //   [false, false, false, false, false, false],
-  //   (...)
-  // ];
   let mergedCells = Array(GRID_SIZE)
     .fill()
     .map(() => Array(GRID_SIZE).fill(false));
