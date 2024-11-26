@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DIRECTIONS, WINNING_CELL_VALUE } from "../constants/constants";
 import {
   checkGameOver,
@@ -12,16 +12,10 @@ export const useGameLogic = (initialGrid) => {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isGameWon, setIsGameWon] = useState(false);
 
-  const initializeGame = () => {
-    setGrid(generateInitialBoard());
-    setIsGameOver(false);
-    setIsGameWon(false);
-  };
+  const handleKeyPress = useCallback(
+    async (event) => {
+      if (isGameOver || isGameWon) return;
 
-  useEffect(() => {
-    if (isGameOver || isGameWon) return;
-
-    const handleKeyPress = async (event) => {
       const moveDirection = DIRECTIONS[event.key];
       if (!moveDirection) return;
 
@@ -42,11 +36,20 @@ export const useGameLogic = (initialGrid) => {
       }
 
       setGrid(updatedGrid);
-    };
+    },
+    [grid, isGameOver, isGameWon]
+  );
 
+  const initializeGame = () => {
+    setGrid(generateInitialBoard());
+    setIsGameOver(false);
+    setIsGameWon(false);
+  };
+
+  useEffect(() => {
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [grid, isGameOver, isGameWon]);
+  }, [handleKeyPress]);
 
   return {
     grid,
