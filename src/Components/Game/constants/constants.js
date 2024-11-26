@@ -14,7 +14,7 @@ export const DIRECTIONS = {
 export const CELL_COLORS = {
   0: "#e5e7eb",
   2: "#f3f4f6",
-  4: "#fef3c7",
+  4: "#ffe16a",
   8: "#fed7aa",
   16: "#fdba74",
   32: "#fb923c",
