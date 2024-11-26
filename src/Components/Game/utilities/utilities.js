@@ -41,38 +41,27 @@ export const getBoardAfterAddingRandomTile = (currentGrid) => {
   return currentGrid;
 };
 
-export const checkGameOver = (currentGrid) => {
-  const { emptyCellsExist } = getEmptyCells(currentGrid);
+const canMergeCells = (
+  sourceCellValue,
+  destinationCellValue,
+  mergedCells = null,
+  sourceRow = null,
+  sourceCol = null,
+  destRow = null,
+  destCol = null
+) => {
+  const shouldMerge = destinationCellValue === sourceCellValue;
 
-  if (emptyCellsExist) {
-    return false;
+  // If mergedCells is not provided, we're just checking if values match (for gameOver check)
+  if (!mergedCells) {
+    return shouldMerge;
   }
 
-  // Game is not over if there are possible merges
-  for (let row = 0; row < GRID_SIZE; row++) {
-    for (let col = 0; col < GRID_SIZE; col++) {
-      const isNotLastRow = row < GRID_SIZE - 1;
-      const isNotLastCol = col < GRID_SIZE - 1;
-      const currentValue = currentGrid[row][col];
+  // Check if either cell has already been merged this turn
+  const isDestinationCellMerged = mergedCells[destRow][destCol];
+  const isSourceCellMerged = mergedCells[sourceRow][sourceCol];
 
-      const valueBelow = currentGrid[row + 1][col];
-      const valueRight = currentGrid[row][col + 1];
-
-      const hasMatchingValueBelow = currentValue === valueBelow;
-      const hasMatchingValueRight = currentValue === valueRight;
-
-      // Only need to check one direction for horizontal and vertical
-      // since checking both cells would mean checking the same cell twice
-      const hasDownwardMerge = isNotLastRow && hasMatchingValueBelow;
-      const hasRightwardMerge = isNotLastCol && hasMatchingValueRight;
-
-      if (hasDownwardMerge || hasRightwardMerge) {
-        return false;
-      }
-    }
-  }
-
-  return true;
+  return shouldMerge && !isDestinationCellMerged && !isSourceCellMerged;
 };
 
 export const moveIsPossible = (
@@ -92,16 +81,46 @@ export const moveIsPossible = (
   const isTargetCellEmpty = destinationCellValue === 0;
   if (isTargetCellEmpty) return true;
 
-  const shouldMerge = destinationCellValue === sourceCellValue;
+  return canMergeCells(
+    sourceCellValue,
+    destinationCellValue,
+    mergedCells,
+    fromRow,
+    fromCol,
+    toRow,
+    toCol
+  );
+};
 
-  // Check if either cell has already been merged this turn
-  const isDestinationCellMerged = mergedCells[toRow][toCol];
-  const isSourceCellMerged = mergedCells[fromRow][fromCol];
+export const checkGameOver = (currentGrid) => {
+  const { emptyCellsExist } = getEmptyCells(currentGrid);
 
-  const isMergingPossible =
-    shouldMerge && !isDestinationCellMerged && !isSourceCellMerged;
+  if (emptyCellsExist) {
+    return false;
+  }
 
-  return isMergingPossible;
+  // Game is not over if there are possible merges
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
+      const isNotLastRow = row < GRID_SIZE - 1;
+      const isNotLastCol = col < GRID_SIZE - 1;
+      const currentValue = currentGrid[row][col];
+
+      // Only need to check one direction for horizontal and vertical
+      // since checking both cells would mean checking the same cell twice
+      if (isNotLastRow) {
+        const valueBelow = currentGrid[row + 1][col];
+        if (canMergeCells(currentValue, valueBelow)) return false;
+      }
+
+      if (isNotLastCol) {
+        const valueRight = currentGrid[row][col + 1];
+        if (canMergeCells(currentValue, valueRight)) return false;
+      }
+    }
+  }
+
+  return true;
 };
 
 export const moveCellTo = (
