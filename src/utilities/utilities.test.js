@@ -33,7 +33,7 @@ describe("Game Utilities", () => {
   });
 
   describe("checkGameOver", () => {
-    it("should return false when empty cells exist", () => {
+    it("should return false when empty does exist", () => {
       const mockGrid = [
         [2, 4, 2, 4, 2, 4],
         [4, 2, 4, 2, 4, 2],
