@@ -39,7 +39,7 @@ export const useGameLogic = (initialGrid) => {
       //ignore not arrow key presses
       if (!moveDirection) return;
 
-      const { newGrid } = getBoardAfterMove(moveDirection, grid);
+      const newGrid = getBoardAfterMove(moveDirection, grid);
 
       if (checkWinningCondition(newGrid)) {
         processWinningMove(newGrid, setGrid, setIsGameWon);

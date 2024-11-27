@@ -17,7 +17,7 @@ describe("useGameLogic", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    utilities.getBoardAfterMove.mockReturnValue({ newGrid: mockInitialGrid });
+    utilities.getBoardAfterMove.mockReturnValue(mockInitialGrid);
     utilities.getBoardAfterAddingRandomTile.mockReturnValue(mockInitialGrid);
     utilities.checkGameOver.mockReturnValue(false);
   });
@@ -59,7 +59,7 @@ describe("useGameLogic", () => {
 
   test("handles winning condition", () => {
     const winningGrid = [[WINNING_CELL_VALUE]];
-    utilities.getBoardAfterMove.mockReturnValue({ newGrid: winningGrid });
+    utilities.getBoardAfterMove.mockReturnValue(winningGrid);
 
     const { result } = renderHook(() => useGameLogic(mockInitialGrid));
 

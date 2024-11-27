@@ -214,5 +214,5 @@ export const getBoardAfterMove = (direction, grid) => {
     }
   }
 
-  return { newGrid };
+  return newGrid;
 };
