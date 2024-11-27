@@ -70,12 +70,23 @@ export const moveCellTo = (
     return;
   }
 
-  // We can safely assume that the cells have the same value (check moveIsPossible implementation)
-  setCellValue(toRow, toCol, destinationCellValue * 2, grid);
-  //reset source cell
-  resetCell(fromRow, fromCol, grid);
-  // Mark cells as merged
-  mergedCells[toRow][toCol] = true;
+  if (
+    canMergeCells(
+      sourceCellValue,
+      destinationCellValue,
+      mergedCells,
+      fromRow,
+      fromCol,
+      toRow,
+      toCol
+    )
+  ) {
+    setCellValue(toRow, toCol, destinationCellValue * 2, grid);
+    //reset source cell
+    resetCell(fromRow, fromCol, grid);
+    // Mark cells as merged
+    mergedCells[toRow][toCol] = true;
+  }
 };
 
 export const getBoardAfterMove = (direction, grid) => {
