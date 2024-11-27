@@ -35,9 +35,6 @@ export const moveIsPossible = (
   const sourceCellValue = getCellValue(fromRow, fromCol, grid);
   const destinationCellValue = getCellValue(toRow, toCol, grid);
 
-  const isSourceCellEmpty = sourceCellValue === 0;
-  if (isSourceCellEmpty) return false; // Can't move an empty cell
-
   const isTargetCellEmpty = destinationCellValue === 0;
   if (isTargetCellEmpty) return true;
 
