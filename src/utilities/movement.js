@@ -12,7 +12,6 @@ export const canMergeCells = (
 ) => {
   const shouldMerge = destinationCellValue === sourceCellValue;
 
-  // If mergedCells is not provided, we're just checking if values match (for gameOver check)
   if (!mergedCells) {
     return shouldMerge;
   }
