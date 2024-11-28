@@ -24,14 +24,14 @@ export const canMergeCells = (
   return shouldMerge && !isDestinationCellMerged && !isSourceCellMerged;
 };
 
-export const moveIsPossible = (
+export const moveIsPossible = ({
   fromRow,
   fromCol,
   toRow,
   toCol,
   grid,
-  mergedCells
-) => {
+  mergedCells,
+}) => {
   const sourceCellValue = getCellValue(fromRow, fromCol, grid);
   const destinationCellValue = getCellValue(toRow, toCol, grid);
 
@@ -49,14 +49,14 @@ export const moveIsPossible = (
   );
 };
 
-export const moveCellTo = (
+export const moveCellTo = ({
   fromRow,
   fromCol,
   toRow,
   toCol,
   grid,
-  mergedCells
-) => {
+  mergedCells,
+}) => {
   const sourceCellValue = getCellValue(fromRow, fromCol, grid);
   const destinationCellValue = getCellValue(toRow, toCol, grid);
 
@@ -70,17 +70,17 @@ export const moveCellTo = (
     return;
   }
 
-  if (
-    canMergeCells(
-      sourceCellValue,
-      destinationCellValue,
-      mergedCells,
-      fromRow,
-      fromCol,
-      toRow,
-      toCol
-    )
-  ) {
+  const shouldMerge = canMergeCells(
+    sourceCellValue,
+    destinationCellValue,
+    mergedCells,
+    fromRow,
+    fromCol,
+    toRow,
+    toCol
+  );
+
+  if (shouldMerge) {
     setCellValue(toRow, toCol, destinationCellValue * 2, grid);
     //reset source cell
     resetCell(fromRow, fromCol, grid);
@@ -106,17 +106,17 @@ export const getBoardAfterMove = (direction, grid) => {
             let currentRow = row;
 
             while (currentRow > 0) {
-              const movementMetaData = [
-                currentRow,
-                col,
-                currentRow - 1,
-                col,
-                newGrid,
+              const moveParams = {
+                fromRow: currentRow,
+                fromCol: col,
+                toRow: currentRow - 1,
+                toCol: col,
+                grid: newGrid,
                 mergedCells,
-              ];
+              };
 
-              if (moveIsPossible(...movementMetaData)) {
-                moveCellTo(...movementMetaData);
+              if (moveIsPossible(moveParams)) {
+                moveCellTo(moveParams);
                 currentRow--;
               } else {
                 break;
@@ -138,16 +138,16 @@ export const getBoardAfterMove = (direction, grid) => {
             let currentRow = row;
 
             while (currentRow < GRID_SIZE - 1) {
-              const movementMetaData = [
-                currentRow,
-                col,
-                currentRow + 1,
-                col,
-                newGrid,
+              const moveParams = {
+                fromRow: currentRow,
+                fromCol: col,
+                toRow: currentRow + 1,
+                toCol: col,
+                grid: newGrid,
                 mergedCells,
-              ];
-              if (moveIsPossible(...movementMetaData)) {
-                moveCellTo(...movementMetaData);
+              };
+              if (moveIsPossible(moveParams)) {
+                moveCellTo(moveParams);
                 currentRow++;
               } else {
                 break;
@@ -169,16 +169,16 @@ export const getBoardAfterMove = (direction, grid) => {
             let currentCol = col;
 
             while (currentCol > 0) {
-              const movementMetaData = [
-                row,
-                currentCol,
-                row,
-                currentCol - 1,
-                newGrid,
+              const moveParams = {
+                fromRow: row,
+                fromCol: currentCol,
+                toRow: row,
+                toCol: currentCol - 1,
+                grid: newGrid,
                 mergedCells,
-              ];
-              if (moveIsPossible(...movementMetaData)) {
-                moveCellTo(...movementMetaData);
+              };
+              if (moveIsPossible(moveParams)) {
+                moveCellTo(moveParams);
                 currentCol--;
               } else {
                 break;
@@ -200,16 +200,16 @@ export const getBoardAfterMove = (direction, grid) => {
             let currentCol = col;
 
             while (currentCol < GRID_SIZE - 1) {
-              const movementMetaData = [
-                row,
-                currentCol,
-                row,
-                currentCol + 1,
-                newGrid,
+              const moveParams = {
+                fromRow: row,
+                fromCol: currentCol,
+                toRow: row,
+                toCol: currentCol + 1,
+                grid: newGrid,
                 mergedCells,
-              ];
-              if (moveIsPossible(...movementMetaData)) {
-                moveCellTo(...movementMetaData);
+              };
+              if (moveIsPossible(moveParams)) {
+                moveCellTo(moveParams);
                 currentCol++;
               } else {
                 break;
