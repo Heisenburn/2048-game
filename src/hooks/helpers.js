@@ -28,12 +28,12 @@ export const initializeGame = (setGrid, setIsGameOver, setIsGameWon) => {
 };
 
 export const handleKeyPress =
-  (grid, isGameOver, isGameWon, setGrid, setIsGameOver, setIsGameWon) =>
+  (grid, setGrid, setIsGameOver, setIsGameWon) =>
   ({ key }) => {
     const moveDirection = DIRECTIONS[key];
     const notArrowIsPressed = !moveDirection;
 
-    if (isGameOver || isGameWon || notArrowIsPressed) return;
+    if (notArrowIsPressed) return;
 
     const newGrid = getBoardAfterMove(moveDirection, grid);
 

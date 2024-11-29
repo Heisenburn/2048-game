@@ -7,15 +7,8 @@ export const useGameLogic = (initialGrid) => {
   const [isGameWon, setIsGameWon] = useState(false);
 
   const handleKeyDown = useCallback(
-    handleKeyPress(
-      grid,
-      isGameOver,
-      isGameWon,
-      setGrid,
-      setIsGameOver,
-      setIsGameWon
-    ),
-    [grid, isGameOver, isGameWon]
+    handleKeyPress(grid, setGrid, setIsGameOver, setIsGameWon),
+    [grid]
   );
 
   useEffect(() => {
