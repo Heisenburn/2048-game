@@ -257,5 +257,29 @@ describe("Game Utilities", () => {
       const result = getBoardAfterMove("left", mockGrid);
       expect(result).toEqual(expectedGrid);
     });
+
+    it("should detect win condition when merging two 1024 tiles", () => {
+      const mockGrid = [
+        [0, 0, 0, 0, 0, 0],
+        [1024, 0, 0, 0, 0, 0],
+        [1024, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const expectedGrid = [
+        [2048, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0],
+      ];
+
+      const result = getBoardAfterMove("up", mockGrid);
+      expect(result).toEqual(expectedGrid);
+      expect(result.flat().includes(2048)).toBe(true);
+    });
   });
 });

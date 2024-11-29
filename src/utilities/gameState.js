@@ -1,6 +1,10 @@
-import { GRID_SIZE } from "../constants/constants";
+import { GRID_SIZE, WINNING_CELL_VALUE } from "../constants/constants";
 import { getEmptyCells } from "./cell";
 import { canMergeCells } from "./movement";
+
+export const checkWinningCondition = (board) => {
+  return board.some((row) => row.some((cell) => cell === WINNING_CELL_VALUE));
+};
 
 export const checkGameOver = (currentGrid) => {
   const { emptyCellsExist } = getEmptyCells(currentGrid);
