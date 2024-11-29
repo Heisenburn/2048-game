@@ -108,7 +108,7 @@ describe("Game Component", () => {
 
     const gridContainer = screen.getByTestId("grid-container");
     expect(gridContainer).toBeInTheDocument();
-    expect(mockGrid.length).toBe(6); // Check rows
-    expect(mockGrid[0].length).toBe(6); // Check columns
+    expect(mockGrid.length).toBe(6);
+    expect(mockGrid[0].length).toBe(6);
   });
 });

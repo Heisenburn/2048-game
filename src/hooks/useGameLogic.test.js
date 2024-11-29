@@ -45,7 +45,7 @@ describe("useGameLogic", () => {
   });
 
   test("handles valid key press", () => {
-    const { result } = renderHook(() => useGameLogic(mockInitialGrid));
+    renderHook(() => useGameLogic(mockInitialGrid));
 
     act(() => {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
@@ -55,19 +55,6 @@ describe("useGameLogic", () => {
       DIRECTIONS["ArrowRight"],
       mockInitialGrid
     );
-  });
-
-  test("handles winning condition", () => {
-    const winningGrid = [[WINNING_CELL_VALUE]];
-    utilities.getBoardAfterMove.mockReturnValue(winningGrid);
-
-    const { result } = renderHook(() => useGameLogic(mockInitialGrid));
-
-    act(() => {
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
-    });
-
-    expect(result.current.isGameWon).toBe(true);
   });
 
   test("handles game over condition", () => {
@@ -80,5 +67,20 @@ describe("useGameLogic", () => {
     });
 
     expect(result.current.isGameOver).toBe(true);
+  });
+
+  test("handles winning condition", () => {
+    const mockWinningGrid = [[WINNING_CELL_VALUE]];
+
+    utilities.getBoardAfterMove.mockReturnValue(mockWinningGrid);
+    utilities.checkWinningCondition.mockReturnValue(true);
+
+    const { result } = renderHook(() => useGameLogic(mockInitialGrid));
+
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight" }));
+    });
+
+    expect(result.current.isGameWon).toBe(true);
   });
 });
