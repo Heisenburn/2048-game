@@ -20,13 +20,15 @@ export const checkGameOver = (currentGrid) => {
       const isNotLastCol = col < GRID_SIZE - 1;
       const currentValue = currentGrid[row][col];
 
-      // Only need to check one direction for horizontal and vertical
-      // since checking both directions would mean checking the same cell twice
+      // Check cell below current cell
+      // We only need to check downward since checking upward would be redundant
       if (isNotLastRow) {
         const valueBelow = currentGrid[row + 1][col];
         if (canMergeCells(currentValue, valueBelow)) return false;
       }
 
+      // Check cell to the right of current cell
+      // We only need to check rightward since checking leftward would be redundant
       if (isNotLastCol) {
         const valueRight = currentGrid[row][col + 1];
         if (canMergeCells(currentValue, valueRight)) return false;

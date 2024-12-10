@@ -1,4 +1,4 @@
-import { GRID_SIZE } from "../constants/constants";
+import { EMPTY_CELL_VALUE, GRID_SIZE } from "../constants/constants";
 import { cellHasValue, getCellValue, resetCell, setCellValue } from "./cell";
 
 export const canMergeCells = (
@@ -12,11 +12,11 @@ export const canMergeCells = (
 ) => {
   const shouldMerge = destinationCellValue === sourceCellValue;
 
+  //mergedCells can be null only when checking gameOver
   if (!mergedCells) {
     return shouldMerge;
   }
 
-  // Check if either cell has already been merged this turn
   const isDestinationCellMerged = mergedCells[destRow][destCol];
   const isSourceCellMerged = mergedCells[sourceRow][sourceCol];
 
@@ -33,19 +33,27 @@ export const moveIsPossible = ({
 }) => {
   const sourceCellValue = getCellValue(fromRow, fromCol, grid);
   const destinationCellValue = getCellValue(toRow, toCol, grid);
+  const isTargetCellEmpty = destinationCellValue === EMPTY_CELL_VALUE;
 
-  const isTargetCellEmpty = destinationCellValue === 0;
-  if (isTargetCellEmpty) return true;
+  const canMerge = isTargetCellEmpty
+    ? false
+    : canMergeCells(
+        sourceCellValue,
+        destinationCellValue,
+        mergedCells,
+        fromRow,
+        fromCol,
+        toRow,
+        toCol
+      );
 
-  return canMergeCells(
+  return {
+    isPossible: isTargetCellEmpty || canMerge,
     sourceCellValue,
     destinationCellValue,
-    mergedCells,
-    fromRow,
-    fromCol,
-    toRow,
-    toCol
-  );
+    isTargetCellEmpty,
+    canMerge,
+  };
 };
 
 export const moveCellTo = ({
@@ -55,41 +63,27 @@ export const moveCellTo = ({
   toCol,
   grid,
   mergedCells,
+  moveDetails,
 }) => {
-  const sourceCellValue = getCellValue(fromRow, fromCol, grid);
-  const destinationCellValue = getCellValue(toRow, toCol, grid);
+  const { sourceCellValue, destinationCellValue, isTargetCellEmpty, canMerge } =
+    moveDetails;
 
-  const targetCellIsEmpty = destinationCellValue === 0;
-
-  if (targetCellIsEmpty) {
-    // Move to empty cell
+  if (isTargetCellEmpty) {
     setCellValue(toRow, toCol, sourceCellValue, grid);
-    //reset source cell
     resetCell(fromRow, fromCol, grid);
     return;
   }
 
-  const shouldMerge = canMergeCells(
-    sourceCellValue,
-    destinationCellValue,
-    mergedCells,
-    fromRow,
-    fromCol,
-    toRow,
-    toCol
-  );
-
-  if (shouldMerge) {
+  if (canMerge) {
     setCellValue(toRow, toCol, destinationCellValue * 2, grid);
-    //reset source cell
     resetCell(fromRow, fromCol, grid);
-    // Mark cells as merged
     mergedCells[toRow][toCol] = true;
   }
 };
 
 export const getBoardAfterMove = (direction, grid) => {
-  const newGrid = grid.map((row) => [...row]);
+  const newGrid = grid.map((row) => [...row]); //creates a shallow copy
+
   const mergedCells = Array(GRID_SIZE)
     .fill()
     .map(() => Array(GRID_SIZE).fill(false));
@@ -113,9 +107,10 @@ export const getBoardAfterMove = (direction, grid) => {
                 grid: newGrid,
                 mergedCells,
               };
+              const moveDetails = moveIsPossible(moveParams);
 
-              if (moveIsPossible(moveParams)) {
-                moveCellTo(moveParams);
+              if (moveDetails.isPossible) {
+                moveCellTo({ ...moveParams, moveDetails });
                 currentRow--;
               } else {
                 break;
@@ -145,8 +140,10 @@ export const getBoardAfterMove = (direction, grid) => {
                 grid: newGrid,
                 mergedCells,
               };
-              if (moveIsPossible(moveParams)) {
-                moveCellTo(moveParams);
+              const moveDetails = moveIsPossible(moveParams);
+
+              if (moveDetails.isPossible) {
+                moveCellTo({ ...moveParams, moveDetails });
                 currentRow++;
               } else {
                 break;
@@ -176,8 +173,10 @@ export const getBoardAfterMove = (direction, grid) => {
                 grid: newGrid,
                 mergedCells,
               };
-              if (moveIsPossible(moveParams)) {
-                moveCellTo(moveParams);
+              const moveDetails = moveIsPossible(moveParams);
+
+              if (moveDetails.isPossible) {
+                moveCellTo({ ...moveParams, moveDetails });
                 currentCol--;
               } else {
                 break;
@@ -207,8 +206,10 @@ export const getBoardAfterMove = (direction, grid) => {
                 grid: newGrid,
                 mergedCells,
               };
-              if (moveIsPossible(moveParams)) {
-                moveCellTo(moveParams);
+              const moveDetails = moveIsPossible(moveParams);
+
+              if (moveDetails.isPossible) {
+                moveCellTo({ ...moveParams, moveDetails });
                 currentCol++;
               } else {
                 break;

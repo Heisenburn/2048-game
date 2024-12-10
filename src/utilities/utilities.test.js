@@ -1,3 +1,8 @@
+import {
+  EMPTY_CELL_VALUE,
+  GRID_SIZE,
+  INITIAL_CELL_VALUE,
+} from "../constants/constants";
 import { getBoardAfterAddingRandomTile } from "./board";
 import { checkGameOver } from "./gameState";
 import { getBoardAfterMove } from "./movement";
@@ -18,14 +23,16 @@ describe("Game Utilities", () => {
 
       // No way to test randomness of the new tile, so we just check that 2 tiles were added
       // Count number of non-zero cells
-      const nonZeroCells = result.flat().filter((cell) => cell !== 0).length;
+      const nonZeroCells = result
+        .flat()
+        .filter((cell) => cell !== EMPTY_CELL_VALUE).length;
       expect(nonZeroCells).toBe(2); // Original tile + new tile
     });
 
     it("should not add a tile when grid is full", () => {
-      const fullGrid = Array(6)
+      const fullGrid = Array(GRID_SIZE)
         .fill()
-        .map(() => Array(6).fill(2));
+        .map(() => Array(GRID_SIZE).fill(INITIAL_CELL_VALUE));
       const result = getBoardAfterAddingRandomTile(fullGrid);
 
       expect(result).toEqual(fullGrid);

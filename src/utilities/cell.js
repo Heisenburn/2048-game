@@ -1,4 +1,4 @@
-import { GRID_SIZE } from "../constants/constants";
+import { EMPTY_CELL_VALUE, GRID_SIZE } from "../constants/constants";
 
 export const getCellValue = (row, col, grid) => grid[row][col];
 
@@ -6,10 +6,11 @@ export const setCellValue = (row, col, value, grid) => {
   grid[row][col] = value;
 };
 
-export const resetCell = (row, col, grid) => setCellValue(row, col, 0, grid);
+export const resetCell = (row, col, grid) =>
+  setCellValue(row, col, EMPTY_CELL_VALUE, grid);
 
 export const cellHasValue = (row, col, grid) => {
-  return grid[row][col] !== 0;
+  return grid[row][col] !== EMPTY_CELL_VALUE;
 };
 
 export const getEmptyCells = (grid) => {
@@ -21,6 +22,6 @@ export const getEmptyCells = (grid) => {
       }
     }
   }
-  const emptyCellsExist = emptyCells.length > 0;
+  const emptyCellsExist = emptyCells.length > EMPTY_CELL_VALUE;
   return { emptyCells, emptyCellsExist };
 };

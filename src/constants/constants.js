@@ -1,5 +1,6 @@
-export const GRID_SIZE = 6;
+export const EMPTY_CELL_VALUE = 0;
 export const INITIAL_CELL_VALUE = 2;
+export const GRID_SIZE = 6;
 export const WINNING_CELL_VALUE = 2048;
 
 export const GAME_WIN_MESSAGE = "You win! Click new game to continue.";
